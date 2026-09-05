@@ -20,4 +20,10 @@ export const env = {
   cloudinary_Secret_KEY: process.env.cloudinary_Secret_KEY,
   googleClientID: process.googleClientID,
   googleClientSECRET: process.googleClientSECRET,
+  adminRegisterSecret: process.ADMIN_REGISTER_SECRET,
+  maxAdmins:process.MAX_ADMINS,
+  smtpHost:process.SMTP_HOST,
+  smtpPort: process.SMTP_PORT,
+  smtpUser: process.SMTP_USER,
+  smtpPass: process.SMTP_PASS,
 };
