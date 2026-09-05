@@ -1,6 +1,7 @@
 node_modules/
 dist/
-.env# Logs
+.env 
+Logs/
 logs
 *.log
 npm-debug.log*
