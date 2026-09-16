@@ -23,12 +23,12 @@ const imgsOnly = (req, file, callback)=>{
         callback(new Error("Only imgs are allowed"), false)
     };
 };
-const uploadImgsStorage = multer({
+export const uploadImgsStorage = multer({
     storage: imgsStorage,
     fileFilter: imgsOnly,
     limits:{fileSize: 1024 * 1024 * 5}
 });
-export default uploadImgsStorage;
+// export uploadImgsStorage;
 
 const videosStorage = multer.diskStorage({
     destination:(req, file, callback)=>{

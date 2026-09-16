@@ -8,9 +8,7 @@ const canManageCourse = (course, user) => {
   return user.role === "admin" || course.instructor.toString() === user.id;
 };
 
-/* ============================================================
-   COURSE CRUD
-   ============================================================ */
+/*  COURSE CRUD */
 
 export const createCourse = async (req, res) => {
   try {
@@ -123,9 +121,7 @@ export const getCourseById = async (req, res) => {
   }
 };
 
-/* ============================================================
-   LECTURE VIDEOS
-   ============================================================ */
+/*  LECTURE VIDEOS  */
 
 export const addLectureVideo = async (req, res) => {
   try {
@@ -200,9 +196,9 @@ export const deleteLectureVideo = async (req, res) => {
   }
 };
 
-/* ============================================================
+/*
    ENROLLMENT
-   ============================================================ */
+   */
 
 export const requestEnroll = async (req, res) => {
   try {
@@ -210,15 +206,21 @@ export const requestEnroll = async (req, res) => {
     if (!course) return res.status(404).json({ success: false, msg: "Course not found" });
 
     const existing = course.enrolledLearners.find((e) => e.learner.toString() === req.user.id);
-    if (existing) {
-      return res.status(409).json({
-        success: false,
-        msg: `You already have a ${existing.status} enrollment request for this course`
-      });
-    }
 
-    course.enrolledLearners.push({ learner: req.user.id, status: "pending" });
-    await course.save();
+if (existing) {
+  if (existing.status !== "rejected") {
+    return res.status(409).json({
+      success: false,
+      msg: `You already have a ${existing.status} enrollment request for this course`
+    });
+  }
+  // Previously rejected — let them try again instead of a permanent lock-out.
+  existing.status = "pending";
+} else {
+  course.enrolledLearners.push({ learner: req.user.id, status: "pending" });
+}
+
+await course.save();
 
     res.status(201).json({ success: true, msg: "Enrollment request sent!, waiting for instructor approval" });
   } catch (error) {
