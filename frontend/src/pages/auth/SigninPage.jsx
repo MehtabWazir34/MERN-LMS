@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../../components/layout/AuthLayout";
 import RoleTabs from "../../components/auth/RoleTabs";
-import GoogleAuthButton from "../../components/auth/GoogleAuthButton";
+import GoogleAuthButton from "../../components/auth/Googleauthbutton.jsx";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import Alert from "../../components/common/Alert";

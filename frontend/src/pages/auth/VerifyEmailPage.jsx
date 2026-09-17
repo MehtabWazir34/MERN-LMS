@@ -4,7 +4,7 @@ import AuthLayout from "../../components/layout/AuthLayout";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
 import { verifyEmail } from "../../api/auth";
-import { decodeJwtPayload } from "../../utils/jwt";
+import { decodeJwtPayload } from "../../utils/Jwt.js";
 
 // The emailed link is `${clientUrl}/verify-email?token=...` — role-agnostic.
 // generateEmailVerifyToken embeds the role in the JWT payload, so we
