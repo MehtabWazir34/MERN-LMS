@@ -1,4 +1,4 @@
-import DashboardShell from "../../components/layout/DashboardShell";
+import DashboardShell from "../../components/layout/Dashboardshell.jsx";
 
 export default function AdminDashboardPage() {
     return (
