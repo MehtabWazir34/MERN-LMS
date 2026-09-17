@@ -8,12 +8,13 @@ import Button from "../../components/common/Button";
 import Alert from "../../components/common/Alert";
 import { ROLES } from "../../utils/roles";
 import { register, googleAuth } from "../../api/auth";
-import { saveSession } from "../../utils/tokenStorage";
+import { useAuth } from "../../context/AuthContext";
 
 const INITIAL_FORM = { name: "", email: "", password: "", confirmPassword: "", secretKey: "" };
 
 export default function SignupPage() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [role, setRole] = useState(ROLES.LEARNER);
     const [form, setForm] = useState(INITIAL_FORM);
     const [pic, setPic] = useState(null);
@@ -81,7 +82,7 @@ export default function SignupPage() {
         try {
             const data = await googleAuth(role, idToken);
             const user = data.learner || data.instructor || data.admin;
-            saveSession(data.token, user);
+            login(data.token, user);
             navigate("/");
         } catch (err) {
             setBanner({ variant: "danger", message: err.response?.data?.msg || "Google sign-up failed" });

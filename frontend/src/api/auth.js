@@ -1,5 +1,5 @@
-import { http } from "./http";
-import { ROLES } from "../utils/roles";
+import { http } from "./http.js";
+import { ROLES } from "../utils/roles.js";
 
 // Each role's routes live at /lms/{admin,instructor,learner} with an
 // identical action shape (register, verify-email, resend-verification,
@@ -33,8 +33,7 @@ export const register = async (role, data) => {
     });
     return res.data;
   }
-  console.log(await http.post(`${base}/register`));
-  
+
   const res = await http.post(`${base}/register`, data);
   return res.data;
 };
@@ -62,5 +61,11 @@ export const verifyEmail = async (role, token) => {
 export const resendVerification = async (role, email) => {
   const { base } = ROLE_CONFIG[role];
   const res = await http.post(`${base}/resend-verification`, { email });
+  return res.data;
+};
+
+export const logout = async (role) => {
+  const { base } = ROLE_CONFIG[role];
+  const res = await http.post(`${base}/logout`);
   return res.data;
 };

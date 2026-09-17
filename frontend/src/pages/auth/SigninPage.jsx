@@ -7,11 +7,12 @@ import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import Alert from "../../components/common/Alert";
 import { ROLES } from "../../utils/roles";
-import { login, googleAuth, resendVerification } from "../../api/auth";
-import { saveSession } from "../../utils/tokenStorage";
+import { login as loginRequest, googleAuth, resendVerification } from "../../api/auth";
+import { useAuth } from "../../context/AuthContext";
 
 export default function SigninPage() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [role, setRole] = useState(ROLES.LEARNER);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -31,7 +32,7 @@ export default function SigninPage() {
 
     const completeLogin = (data) => {
         const user = data.learner || data.instructor || data.admin;
-        saveSession(data.token, user);
+        login(data.token, user);
         navigate("/");
     };
 
@@ -43,7 +44,7 @@ export default function SigninPage() {
 
         setIsSubmitting(true);
         try {
-            const data = await login(role, { email, password });
+            const data = await loginRequest(role, { email, password });
             completeLogin(data);
         } catch (err) {
             const status = err.response?.status;

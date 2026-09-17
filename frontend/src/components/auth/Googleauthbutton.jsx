@@ -24,7 +24,7 @@ export default function GoogleAuthButton({ onCredential, onError }) {
         <GoogleLogin
             onSuccess={(res) => onCredential(res.credential)}
             onError={() => onError("Google sign-in failed, please try again")}
-            width="100%"
+            width="320"
         />
     );
-}
+};

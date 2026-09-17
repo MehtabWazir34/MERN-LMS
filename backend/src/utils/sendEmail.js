@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendVerificationEmail = async (to, name, verifyLink) => {
   await transporter.sendMail({
-    from: `"LMS" <${env.smtpUser}>`,
+    from: `"LMS" <${env.smtpFrom ?? "no-reply@lms.test"}>`,
     to,
     subject: "Verify your email — LMS",
     html: `

@@ -19,14 +19,15 @@ export const app = express();
 connectDatabase();
 console.log(env.clientUrl);
 
-// app.use(helmet());
+app.use(helmet());
 app.use(cors(
-  { origin: env.clientUrl || "http://localhost:5173", credentials: true }
+  { origin: env.clientUrl || "http://localhost:5173", 
+    credentials: true }
 
 ));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
-// app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
+app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'LMS API is running' });
