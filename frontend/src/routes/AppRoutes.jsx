@@ -9,7 +9,7 @@ import AdminDashboardPage from "../pages/admin/DashboardPage";
 import InstructorDashboardPage from "../pages/instructor/DashboardPage";
 import LearnerDashboardPage from "../pages/learner/DashboardPage";
 import ProtectedRoute from "./ProtectedRoute";
-import GuestRoute from "./GuestRoute";
+import GuestRoute from "./Guestroute.jsx";
 import { ROLES } from "../utils/roles";
 
 export default function AppRoutes() {
