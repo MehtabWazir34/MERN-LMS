@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "../pages/public/Homepage.jsx";
 import CoursesPage from "../pages/public/Coursespage.jsx";
-import CourseDetailPage from "../pages/public/CourseDetailPage.jsx";
+import CourseDetailPage from "../pages/public/Coursedetailpage.jsx";
 import SignupPage from "../pages/auth/SignupPage";
 import SigninPage from "../pages/auth/SigninPage";
 import VerifyEmailPage from "../pages/auth/VerifyEmailPage";
