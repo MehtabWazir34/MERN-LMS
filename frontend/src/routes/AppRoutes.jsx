@@ -5,10 +5,10 @@ import CourseDetailPage from "../pages/public/Coursedetailpage.jsx";
 import SignupPage from "../pages/auth/SignupPage";
 import SigninPage from "../pages/auth/SigninPage";
 import VerifyEmailPage from "../pages/auth/VerifyEmailPage";
-import AdminDashboardPage from "../pages/admin/DashboardPage";
-import InstructorDashboardPage from "../pages/instructor/DashboardPage";
-import LearnerDashboardPage from "../pages/learner/DashboardPage";
-import ProtectedRoute from "./ProtectedRoute";
+import AdminDashboardPage from "../pages/admin/DashboardPage.jsx";
+import InstructorDashboardPage from "../pages/instructor/DashboardPage.jsx";
+import LearnerDashboardPage from "../pages/learner/DashboardPage.jsx";
+import ProtectedRoute from "./ProtectedRoute.jsx";
 import GuestRoute from "./Guestroute.jsx";
 import { ROLES } from "../utils/roles";
 
