@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import PublicLayout from "../../components/layout/PublicLayout";
+import PublicLayout from "../../components/layout/Publiclayout.jsx";
 import CourseCard from "../../components/common/CourseCard";
 import Spinner from "../../components/common/Spinner";
 import Alert from "../../components/common/Alert";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import PublicLayout from "../../components/layout/PublicLayout";
+import PublicLayout from "../../components/layout/Publiclayout.jsx";
 import Button from "../../components/common/Button";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
