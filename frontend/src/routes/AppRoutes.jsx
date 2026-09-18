@@ -1,15 +1,17 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import HomePage from "../pages/public/Homepage.jsx";
-import CoursesPage from "../pages/public/Coursespage.jsx";
-import CourseDetailPage from "../pages/public/Coursedetailpage.jsx";
+import HomePage from "../pages/public/HomePage";
+import CoursesPage from "../pages/public/CoursesPage";
+import CourseDetailPage from "../pages/public/CourseDetailPage";
 import SignupPage from "../pages/auth/SignupPage";
 import SigninPage from "../pages/auth/SigninPage";
 import VerifyEmailPage from "../pages/auth/VerifyEmailPage";
-import AdminDashboardPage from "../pages/admin/DashboardPage.jsx";
-import InstructorDashboardPage from "../pages/instructor/DashboardPage.jsx";
-import LearnerDashboardPage from "../pages/learner/DashboardPage.jsx";
-import ProtectedRoute from "./ProtectedRoute.jsx";
-import GuestRoute from "./Guestroute.jsx";
+import AdminDashboardPage from "../pages/admin/DashboardPage";
+import InstructorDashboardPage from "../pages/instructor/DashboardPage";
+import CourseFormPage from "../pages/instructor/Courseformpage.jsx";
+import CourseManagePage from "../pages/instructor/Coursemanagepage .jsx";
+import LearnerDashboardPage from "../pages/learner/DashboardPage";
+import ProtectedRoute from "./ProtectedRoute";
+import GuestRoute from "./GuestRoute";
 import { ROLES } from "../utils/roles";
 
 export default function AppRoutes() {
@@ -52,6 +54,30 @@ export default function AppRoutes() {
                 element={
                     <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR]}>
                         <InstructorDashboardPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/instructor/courses/new"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR]}>
+                        <CourseFormPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/instructor/courses/:id/edit"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR]}>
+                        <CourseFormPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/instructor/courses/:id/manage"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR]}>
+                        <CourseManagePage />
                     </ProtectedRoute>
                 }
             />
