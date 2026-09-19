@@ -1,18 +1,18 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import HomePage from "../pages/public/HomePage";
-import CoursesPage from "../pages/public/CoursesPage";
-import CourseDetailPage from "../pages/public/CourseDetailPage";
-import SignupPage from "../pages/auth/SignupPage";
-import SigninPage from "../pages/auth/SigninPage";
-import VerifyEmailPage from "../pages/auth/VerifyEmailPage";
-import AdminDashboardPage from "../pages/admin/DashboardPage";
-import InstructorDashboardPage from "../pages/instructor/DashboardPage";
+import HomePage from "../pages/public/Homepage.jsx";
+import CoursesPage from "../pages/public/Coursespage.jsx";
+import CourseDetailPage from "../pages/public/Coursedetailpage.jsx";
+import SignupPage from "../pages/auth/SignupPage.jsx";
+import SigninPage from "../pages/auth/SigninPage.jsx";
+import VerifyEmailPage from "../pages/auth/VerifyEmailPage.jsx";
+import AdminDashboardPage from "../pages/admin/DashboardPage.jsx";
+import InstructorDashboardPage from "../pages/instructor/DashboardPage.jsx";
 import CourseFormPage from "../pages/instructor/Courseformpage.jsx";
 import CourseManagePage from "../pages/instructor/Coursemanagepage .jsx";
-import LearnerDashboardPage from "../pages/learner/DashboardPage";
+import LearnerDashboardPage from "../pages/learner/DashboardPage.jsx";
 import ProtectedRoute from "./ProtectedRoute";
-import GuestRoute from "./GuestRoute";
-import { ROLES } from "../utils/roles";
+import GuestRoute from "./Guestroute";
+import { ROLES } from "../utils/roles.js";
 
 export default function AppRoutes() {
     return (
