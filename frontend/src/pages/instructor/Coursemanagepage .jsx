@@ -3,8 +3,10 @@ import { useParams, Link } from "react-router-dom";
 import DashboardShell from "../../components/layout/Dashboardshell.jsx";
 import Alert from "../../components/common/Alert.jsx";
 import Spinner from "../../components/common/Spinner.jsx";
-import LectureManager from "../../pages/instructor/Lecturemanager.jsx";
-import EnrollmentManager from "../../pages/instructor/Enrollmentmanager.jsx";
+import LectureManager from "./LectureManager";
+import EnrollmentManager from "./EnrollmentManager";
+import AttendanceManager from "./Attendancemanager.jsx";
+import ResultManager from "./Resultmanager.jsx";
 import { getCourseById } from "../../api/courses";
 import { useAuth } from "../../context/AuthContext";
 
@@ -84,6 +86,8 @@ export default function CourseManagePage() {
             <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2">
                 <LectureManager courseId={course._id} videos={course.videos} onVideosChange={handleVideosChange} />
                 <EnrollmentManager courseId={course._id} />
+                <AttendanceManager courseId={course._id} />
+                <ResultManager courseId={course._id} />
             </div>
         </DashboardShell>
     );
