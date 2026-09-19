@@ -45,3 +45,15 @@ export const deleteAdmin = async (id) => {
   const res = await http.delete(`/admin/admins/${id}`);
   return res.data; // { success, msg }
 };
+
+// Requires the getLearnerAttendanceByAdmin/getLearnerResultsByAdmin
+// additions pasted into adminCtrls.js + adminRoutes.js.
+export const getLearnerAttendance = async (learnerId, config = {}) => {
+  const res = await http.get(`/admin/learners/${learnerId}/attendance`, config);
+  return res.data; // { success, count, records }
+};
+
+export const getLearnerResults = async (learnerId, config = {}) => {
+  const res = await http.get(`/admin/learners/${learnerId}/results`, config);
+  return res.data; // { success, count, results }
+};

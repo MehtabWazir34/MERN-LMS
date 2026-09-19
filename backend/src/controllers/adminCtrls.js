@@ -10,6 +10,8 @@ import { generateAuthToken, generateEmailVerifyToken } from '../utils/generateTo
 import { sendVerificationEmail } from '../utils/sendEmail.js';
 import { makeVerifyEmailHandler } from '../utils/verifyEmailHandler.js';
 import { isEmailTaken } from '../utils/checkEmailUnique.js';
+import {attendanceModel} from '../models/attendanceModel.js';
+import {resultModel} from '../models/resultModel.js'
 
 const googleClient = new OAuth2Client(env.googleClientID);
 
@@ -328,5 +330,28 @@ export const deleteAdminByAdmin = async (req, res) => {
     res.status(200).json({ success: true, msg: "Admin removed!" });
   } catch (error) {
     res.status(500).json({ success: false, msg: "Failed to delete admin", ERR: error.message });
+  }
+};
+
+export const getLearnerAttendanceByAdmin = async (req, res) => {
+  try {
+    const records = await attendanceModel.find({ learner: req.params.id })
+      .populate("subject", "title")
+      .sort({ date: -1 });
+
+    res.status(200).json({ success: true, count: records.length, records });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: "Failed to fetch learner attendance", ERR: error.message });
+  }
+};
+
+export const getLearnerResultsByAdmin = async (req, res) => {
+  try {
+    const results = await resultModel.find({ learner: req.params.id })
+      .populate("subject", "title");
+
+    res.status(200).json({ success: true, count: results.length, results });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: "Failed to fetch learner results", ERR: error.message });
   }
 };

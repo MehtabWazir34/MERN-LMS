@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import DashboardShell from "../../components/layout/Dashboardshell.jsx";
-import Alert from "../../components/common/Alert.jsx";
-import Spinner from "../../components/common/Spinner.jsx";
-import LectureManager from "./LectureManager";
-import EnrollmentManager from "./EnrollmentManager";
-import AttendanceManager from "./Attendancemanager.jsx";
-import ResultManager from "./Resultmanager.jsx";
+import DashboardShell from "../../components/layout/Dashboardshell";
+import Alert from "../../components/common/Alert";
+import Spinner from "../../components/common/Spinner";
+import LectureManager from "../instructor/Lecturemanager";
+import EnrollmentManager from "../instructor/Enrollmentmanager";
+import AttendanceManager from "../instructor/Attendancemanager";
+import ResultManager from "../instructor/Resultmanager";
 import { getCourseById } from "../../api/courses";
 import { useAuth } from "../../context/AuthContext";
 
 export default function CourseManagePage() {
     const { id } = useParams();
-    const { user } = useAuth();
+    const { user, role } = useAuth();
+
+    const dashboardPath = role === "admin" ? "/admin" : "/instructor";
 
     const [course, setCourse] = useState(null);
     const [status, setStatus] = useState("loading"); // loading | ready | error | forbidden
@@ -28,7 +30,7 @@ export default function CourseManagePage() {
                 // itself doesn't enforce this, only the mutating endpoints
                 // (canManageCourse) do. This just avoids showing management UI
                 // for a course that isn't theirs.
-                if (data.course.instructor?._id !== user?._id) {
+                if (data.course.instructor?._id !== user?._id && role !== "admin") {
                     setStatus("forbidden");
                     return;
                 }
@@ -42,7 +44,7 @@ export default function CourseManagePage() {
 
         load();
         return () => controller.abort();
-    }, [id, user?._id]);
+    }, [id, user?._id, role]);
 
     // LectureManager reports the fresh `videos` array after every
     // add/edit/delete — folded back into local course state so this page
@@ -79,7 +81,7 @@ export default function CourseManagePage() {
 
     return (
         <DashboardShell title={course.title}>
-            <Link to="/instructor" className="text-sm font-medium text-primary hover:underline">
+            <Link to={dashboardPath} className="text-sm font-medium text-primary hover:underline">
                 ← Back to dashboard
             </Link>
 

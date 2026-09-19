@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Alert from "../../components/common/Alert.jsx";
 import Spinner from "../../components/common/Spinner.jsx";
-import { getAllAdmins, deleteAdmin } from "../../api/admin";
+import { getAllAdmins, deleteAdmin } from "../../api/admin.js";
 import { useAuth } from "../../context/AuthContext";
 
 export default function AdminTable() {

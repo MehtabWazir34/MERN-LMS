@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import DashboardShell from "../../components/layout/DashboardShell";
+import DashboardShell from "../../components/layout/Dashboardshell";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import Alert from "../../components/common/Alert";
@@ -14,7 +14,9 @@ export default function CourseFormPage() {
     const { id } = useParams(); // undefined in create mode
     const isEditMode = Boolean(id);
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, role } = useAuth();
+
+    const dashboardPath = role === "admin" ? "/admin" : "/instructor";
 
     const [form, setForm] = useState(EMPTY_FORM);
     const [poster, setPoster] = useState(null);
@@ -42,7 +44,7 @@ export default function CourseFormPage() {
                 // the fetch itself, only by updateCourse's canManageCourse check
                 // on submit. Checking here just avoids showing an edit form the
                 // save would reject anyway.
-                if (course.instructor?._id !== user?._id) {
+                if (course.instructor?._id !== user?._id && role !== "admin") {
                     setLoadStatus("forbidden");
                     return;
                 }
@@ -62,7 +64,7 @@ export default function CourseFormPage() {
 
         load();
         return () => controller.abort();
-    }, [id, isEditMode, user?._id]);
+    }, [id, isEditMode, user?._id, role]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -95,7 +97,7 @@ export default function CourseFormPage() {
             } else {
                 await createCourse(payload);
             }
-            navigate("/instructor");
+            navigate(dashboardPath);
         } catch (err) {
             setBanner({
                 variant: "danger",
@@ -205,7 +207,7 @@ export default function CourseFormPage() {
                     <Button type="submit" isLoading={isSubmitting} fullWidth={false} className="px-6">
                         {isEditMode ? "Save changes" : "Create course"}
                     </Button>
-                    <Button type="button" variant="secondary" fullWidth={false} onClick={() => navigate("/instructor")}>
+                    <Button type="button" variant="secondary" fullWidth={false} onClick={() => navigate(dashboardPath)}>
                         Cancel
                     </Button>
                 </div>

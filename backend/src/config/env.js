@@ -13,6 +13,7 @@ for (const key of requiredEnv) {
     throw new Error(`Missing required environment variable: ${key}`);
   }
 }
+// console.log(process.env.ADMIN_REGISTER_SECRET);
 
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',

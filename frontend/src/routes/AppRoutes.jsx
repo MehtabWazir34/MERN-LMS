@@ -68,7 +68,7 @@ export default function AppRoutes() {
             <Route
                 path="/instructor/courses/:id/edit"
                 element={
-                    <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR]}>
+                    <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR, ROLES.ADMIN]}>
                         <CourseFormPage />
                     </ProtectedRoute>
                 }
@@ -76,7 +76,7 @@ export default function AppRoutes() {
             <Route
                 path="/instructor/courses/:id/manage"
                 element={
-                    <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR]}>
+                    <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR, ROLES.ADMIN]}>
                         <CourseManagePage />
                     </ProtectedRoute>
                 }
