@@ -152,3 +152,25 @@ export const googleAuthInstructor = async (req, res) => {
 export const logoutInstructor = async (req, res) => {
   res.status(200).json({ success: true, msg: "Logged out!" });
 };
+export const updateMyProfile = async (req, res) => {
+  try {
+    const instructor = await instructorModel.findById(req.user.id);
+    if (!instructor) return res.status(404).json({ success: false, msg: "Instructor not found" });
+
+    const { name, about, contactNumber, address } = req.body;
+    if (name !== undefined) instructor.name = name;
+    if (about !== undefined) instructor.about = about;
+    if (contactNumber !== undefined) instructor.contactNumber = contactNumber;
+    if (address !== undefined) instructor.address = address;
+    if (req.file) instructor.pic = await uploadToCloudinary(req.file.path, "profile-pics");
+
+    await instructor.save();
+
+    const updated = instructor.toObject();
+    delete updated.password;
+
+    res.status(200).json({ success: true, msg: "Profile updated!", instructor: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: "Failed to update profile", ERR: error.message });
+  }
+};

@@ -19,7 +19,8 @@ import {
   getAllAdmins,
   deleteAdminByAdmin,
   getLearnerResultsByAdmin,
-  getLearnerAttendanceByAdmin
+  getLearnerAttendanceByAdmin,
+  updateMyProfile
 } from '../controllers/adminCtrls.js';
 
 const adminRouter = express.Router();
@@ -49,5 +50,5 @@ adminRouter.get('/learners/:id/results', authCheck, restrictTo('admin'), getLear
 
 adminRouter.get('/admins', authCheck, restrictTo('admin'), getAllAdmins);
 adminRouter.delete('/admins/:id', authCheck, restrictTo('admin'), deleteAdminByAdmin);
-
+adminRouter.patch('/profile', authCheck, restrictTo('admin'), uploadImgsStorage.single('pic'), updateMyProfile);
 export default adminRouter;

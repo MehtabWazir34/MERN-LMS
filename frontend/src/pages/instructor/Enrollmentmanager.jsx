@@ -3,10 +3,10 @@ import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
 import { getEnrollmentRequests, respondToEnrollment } from "../../api/courses";
 
-// view="pending" -> Enrollment Requests tab (Approve/Reject)
-// view="approved" -> Enrolled Students tab (Remove only)
-// Single fetch either way — getEnrollmentRequests always returns every
-// status, this just decides which slice and which action buttons render.
+// view="pending" -> Enrollment Requests tab: shows pending AND rejected
+// (rejected needs somewhere to live so it's reviewable/reconsiderable —
+// it was previously invisible in every tab, which was the actual bug).
+// view="approved" -> Enrolled Students tab (Remove only).
 export default function EnrollmentManager({ courseId, view }) {
     const [enrollments, setEnrollments] = useState([]);
     const [status, setStatus] = useState("loading"); // loading | success | error
@@ -52,9 +52,20 @@ export default function EnrollmentManager({ courseId, view }) {
         }
     };
 
-    const visible = enrollments.filter((e) => e.status === view);
+    const visible =
+        view === "pending"
+            ? enrollments.filter((e) => e.status === "pending" || e.status === "rejected")
+            : enrollments.filter((e) => e.status === "approved");
+
     const heading = view === "pending" ? "Enrollment requests" : "Enrolled students";
     const emptyText = view === "pending" ? "No enrollment requests yet." : "No enrolled students yet.";
+
+    const statusBadge = (s) => {
+        if (s === "rejected") {
+            return <span className="rounded-full bg-danger/10 px-2.5 py-1 text-xs font-medium text-danger">Rejected</span>;
+        }
+        return null; // "pending" needs no badge — it's the default/only other state in this view
+    };
 
     return (
         <div>
@@ -90,7 +101,10 @@ export default function EnrollmentManager({ courseId, view }) {
                             className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4"
                         >
                             <div className="min-w-0">
-                                <p className="truncate font-medium text-text-primary">{enrollment.learner?.name}</p>
+                                <div className="flex items-center gap-2">
+                                    <p className="truncate font-medium text-text-primary">{enrollment.learner?.name}</p>
+                                    {statusBadge(enrollment.status)}
+                                </div>
                                 <p className="truncate text-sm text-text-secondary">{enrollment.learner?.email}</p>
                             </div>
 
@@ -105,14 +119,16 @@ export default function EnrollmentManager({ courseId, view }) {
                                         >
                                             Approve
                                         </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRespond(enrollment._id, "rejected")}
-                                            disabled={respondingId === enrollment._id}
-                                            className="rounded-md border border-danger/30 bg-danger/10 px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-danger/20 disabled:opacity-60"
-                                        >
-                                            Reject
-                                        </button>
+                                        {enrollment.status !== "rejected" && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRespond(enrollment._id, "rejected")}
+                                                disabled={respondingId === enrollment._id}
+                                                className="rounded-md border border-danger/30 bg-danger/10 px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-danger/20 disabled:opacity-60"
+                                            >
+                                                Reject
+                                            </button>
+                                        )}
                                     </>
                                 )}
 

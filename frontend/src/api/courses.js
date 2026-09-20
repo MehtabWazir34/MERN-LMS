@@ -1,23 +1,3 @@
-// import { http } from "./http";
-
-// export const getAllCourses = async () => {
-//   const res = await http.get("/course");
-//   return res.data; // { success, count, courses }
-// };
-
-// export const getCourseById = async (id) => {
-//   const res = await http.get(`/course/${id}`);
-//   return res.data; // { success, course }
-// };
-
-// // Learner-only per restrictTo('learner') on this route — a non-learner
-// // calling this gets a 403 from the backend, which the caller surfaces
-// // via err.response.data.msg like any other error.
-// export const requestEnroll = async (id) => {
-//   const res = await http.post(`/course/${id}/enroll`);
-//   return res.data;
-// };
-
 import { http } from "./http";
 
 export const getAllCourses = async (config = {}) => {
@@ -33,9 +13,24 @@ export const getCourseById = async (id, config = {}) => {
 // Learner-only per restrictTo('learner') on this route — a non-learner
 // calling this gets a 403 from the backend, which the caller surfaces
 // via err.response.data.msg like any other error.
-export const requestEnroll = async (id) => {
-  const res = await http.post(`/course/${id}/enroll`);
+export const requestEnroll = async (id, { contactNumber, address }) => {
+  const res = await http.post(`/course/${id}/enroll`, { contactNumber, address });
   return res.data;
+};
+
+// Requires the getMyEnrollments addition pasted into courseCtrls.js /
+// courseRoutes.js (registered BEFORE the '/:id' route).
+export const getMyEnrollments = async (config = {}) => {
+  // const res = await http.get("/course/my-enrollments", config);
+  
+  // return res.data; // { success, count, enrollments }
+  try {
+    const res = await http.get("/course/my-enrollments", config);
+    console.log("Results Data:", res?.data);
+    return res.data;
+  } catch (error) {
+    console.log("ERR:", error.message);
+  }
 };
 
 // Local to this file on purpose — auth.js already has its own identical

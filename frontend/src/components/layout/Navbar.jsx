@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import Button from "../common/Button";
+import Button from "../common/Button.jsx";
 
 export default function Navbar() {
     const { isAuthenticated, role, user, logout } = useAuth();
@@ -25,7 +25,9 @@ export default function Navbar() {
                 <div className="flex items-center gap-3">
                     {isAuthenticated ? (
                         <>
-                            <span className="hidden text-sm text-text-secondary sm:inline">{user?.name}</span>
+                            <Link to="/profile" className="hidden text-sm text-text-secondary hover:text-text-primary sm:inline">
+                                {user?.name}
+                            </Link>
                             <Button fullWidth={false} onClick={() => navigate(`/${role}`)}>
                                 Dashboard
                             </Button>

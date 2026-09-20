@@ -355,3 +355,24 @@ export const getLearnerResultsByAdmin = async (req, res) => {
     res.status(500).json({ success: false, msg: "Failed to fetch learner results", ERR: error.message });
   }
 };
+export const updateMyProfile = async (req, res) => {
+  try {
+    const admin = await adminModel.findById(req.user.id);
+    if (!admin) return res.status(404).json({ success: false, msg: "Admin not found" });
+
+    const { name, contactNumber, address } = req.body;
+    if (name !== undefined) admin.name = name;
+    if (contactNumber !== undefined) admin.contactNumber = contactNumber;
+    if (address !== undefined) admin.address = address;
+    if (req.file) admin.pic = await uploadToCloudinary(req.file.path, "profile-pics");
+
+    await admin.save();
+
+    const updated = admin.toObject();
+    delete updated.password;
+
+    res.status(200).json({ success: true, msg: "Profile updated!", admin: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: "Failed to update profile", ERR: error.message });
+  }
+};

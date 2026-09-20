@@ -13,7 +13,10 @@ const Schema = new mongoose.Schema({
     pic: { type: String, default: "" },
     role: { type: String, default: "learner", immutable: true },
     verifiedStatus: { type: Boolean, default: false },
-    enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }]
+    enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
+    contactNumber: { type: String, default: "" },
+    address: { type: String, default: "" },
+    profileLocked: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export const learnerModel = mongoose.model("Learner", Schema);

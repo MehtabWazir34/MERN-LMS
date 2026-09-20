@@ -19,6 +19,17 @@ export function AuthProvider({ children }) {
         setUser(newUser);
     };
 
+    // For ProfilePage after a successful save — merges the backend's
+    // updated fields into the current session without a fresh login,
+    // keeping both React state and localStorage in sync.
+    const updateUser = (updatedFields) => {
+        setUser((prev) => {
+            const next = { ...prev, ...updatedFields };
+            saveSession(token, next);
+            return next;
+        });
+    };
+
     const logout = async () => {
         try {
             // logoutLearner/Instructor/Admin are currently stateless (no token
@@ -43,8 +54,9 @@ export function AuthProvider({ children }) {
             isAuthenticated: Boolean(token),
             login,
             logout,
+            updateUser,
         }),
-        [token, user, logout]
+        [token, user]
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

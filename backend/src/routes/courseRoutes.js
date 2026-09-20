@@ -15,6 +15,7 @@ import {
   respondToEnrollment,
   getEnrollmentRequests
 } from '../controllers/courseCtrls.js';
+import { getMyEnrollments } from '../controllers/learnerCtrls.js';
 
 const courseRouter = express.Router();
 
@@ -38,5 +39,7 @@ courseRouter.delete('/:id/videos/:videoId', authCheck, restrictTo('instructor', 
 courseRouter.post('/:id/enroll', authCheck, restrictTo('learner'), requestEnroll);
 courseRouter.get('/:id/enroll', authCheck, restrictTo('instructor', 'admin'), getEnrollmentRequests);
 courseRouter.patch('/:id/enroll/:enrollmentId', authCheck, restrictTo('instructor', 'admin'), respondToEnrollment);
-
+courseRouter.get("/", getAllCourses)
+courseRouter.get('/my-enrollments', authCheck, restrictTo('learner'), getMyEnrollments);
+courseRouter.get('/:id', optionalAuth, getCourseById);
 export default courseRouter;

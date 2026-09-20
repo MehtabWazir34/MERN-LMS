@@ -202,32 +202,36 @@ export const deleteLectureVideo = async (req, res) => {
 
 export const requestEnroll = async (req, res) => {
   try {
+    const { contactNumber, address } = req.body;
+    if (!contactNumber || !address) {
+      return res.status(400).json({ success: false, msg: "Contact number and address are required" });
+    }
+
     const course = await coursesModel.findById(req.params.id);
     if (!course) return res.status(404).json({ success: false, msg: "Course not found" });
 
     const existing = course.enrolledLearners.find((e) => e.learner.toString() === req.user.id);
 
-if (existing) {
-  if (existing.status !== "rejected") {
-    return res.status(409).json({
-      success: false,
-      msg: `You already have a ${existing.status} enrollment request for this course`
-    });
-  }
-  // Previously rejected — let them try again instead of a permanent lock-out.
-  existing.status = "pending";
-} else {
-  course.enrolledLearners.push({ learner: req.user.id, status: "pending" });
-}
+    if (existing) {
+      if (existing.status !== "rejected") {
+        return res.status(409).json({
+          success: false,
+          msg: `You already have a ${existing.status} enrollment request for this course`
+        });
+      }
+      existing.status = "pending";
+      existing.contactNumber = contactNumber;
+      existing.address = address;
+    } else {
+      course.enrolledLearners.push({ learner: req.user.id, status: "pending", contactNumber, address });
+    }
 
-await course.save();
-
+    await course.save();
     res.status(201).json({ success: true, msg: "Enrollment request sent!, waiting for instructor approval" });
   } catch (error) {
     res.status(500).json({ success: false, msg: "Failed to request enrollment", ERR: error.message });
   }
 };
-
 export const respondToEnrollment = async (req, res) => {
   try {
     const { id, enrollmentId } = req.params;

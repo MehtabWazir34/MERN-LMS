@@ -13,6 +13,8 @@ import LearnerDashboardPage from "../pages/learner/DashboardPage.jsx";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./Guestroute";
 import { ROLES } from "../utils/roles.js";
+import ProfilePage from "../pages/ProfilePage.jsx";
+// ProfilePage
 
 export default function AppRoutes() {
     return (
@@ -86,6 +88,14 @@ export default function AppRoutes() {
                 element={
                     <ProtectedRoute allowedRoles={[ROLES.LEARNER]}>
                         <LearnerDashboardPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/profile"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.INSTRUCTOR, ROLES.LEARNER]}>
+                        <ProfilePage />
                     </ProtectedRoute>
                 }
             />

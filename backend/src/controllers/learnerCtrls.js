@@ -6,6 +6,9 @@ import { generateAuthToken, generateEmailVerifyToken } from "../utils/generateTo
 import { sendVerificationEmail } from "../utils/sendEmail.js";
 import { makeVerifyEmailHandler } from "../utils/verifyEmailHandler.js";
 import { isEmailTaken } from "../utils/checkEmailUnique.js";
+import { coursesModel } from "../models/courses.js";
+import { uploadToCloudinary } from "../config/uploadToCloudinary.js";
+
 
 const googleClient = new OAuth2Client(env.googleClientID);
 
@@ -141,20 +144,104 @@ export const logoutLearner = async (req, res) => {
   res.status(200).json({ success: true, msg: "Logged out!" });
 };
 
-/* ============================================================
+/* 
    LEARNER SELF-SERVICE
-   ============================================================ */
-
-export const getMyEnrolledCourses = async (req, res) => {
+    */
+export const updateMyProfile = async (req, res) => {
   try {
-    const learner = await learnerModel
-      .findById(req.user.id)
-      .populate("enrolledCourses", "title description poster price instructor");
-
+    const learner = await learnerModel.findById(req.user.id);
     if (!learner) return res.status(404).json({ success: false, msg: "Learner not found" });
 
-    res.status(200).json({ success: true, courses: learner.enrolledCourses });
+    // One-time edit: once a learner has ever saved changes here, every
+    // subsequent attempt is refused — they must go through an admin for
+    // further changes. This is the ONLY place this restriction lives.
+    if (learner.profileLocked) {
+      return res.status(403).json({
+        success: false,
+        msg: "Your profile can only be edited once and has already been locked. Contact an admin for further changes."
+      });
+    }
+
+    const { name, contactNumber, address } = req.body;
+    if (name !== undefined) learner.name = name;
+    if (contactNumber !== undefined) learner.contactNumber = contactNumber;
+    if (address !== undefined) learner.address = address;
+    if (req.file) learner.pic = await uploadToCloudinary(req.file.path, "profile-pics");
+
+    learner.profileLocked = true;
+    await learner.save();
+
+    const updated = learner.toObject();
+    delete updated.password;
+
+    res.status(200).json({ success: true, msg: "Profile updated! This was your one allowed edit.", learner: updated });
   } catch (error) {
-    res.status(500).json({ success: false, msg: "Failed to fetch your courses", ERR: error.message });
+    res.status(500).json({ success: false, msg: "Failed to update profile", ERR: error.message });
   }
 };
+ export const getMyEnrollments = async (req, res) => {
+  try {
+    console.log("========== MY ENROLLMENTS ==========");
+    // console.log("USER:", req.user);
+    // console.log("USER ID:", req.user?.id);
+
+    const courses = await coursesModel
+      .find({ "enrolledLearners.learner": req.user.id })
+      .select("title poster enrolledLearners");
+
+    // console.log("COURSES FOUND:", courses.length);
+
+    const enrollments = courses.map((course) => {
+      const entry = course.enrolledLearners.find(
+        (e) => e.learner.toString() === req.user.id
+      );
+
+      // console.log("ENTRY:", entry);
+
+      return {
+        course: {
+          _id: course._id,
+          title: course.title,
+          poster: course.poster,
+        },
+        status: entry?.status,
+      };
+    });
+
+    console.log("FINAL:", enrollments);
+
+    return res.status(200).json({
+      success: true,
+      count: enrollments.length,
+      enrollments,
+    });
+  } catch (error) {
+    console.error("MY ENROLLMENTS ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      msg: "Failed to fetch your enrollments",
+      ERR: error.message,
+    });
+  }
+};
+// export const getMyEnrollments = async (req, res) => {
+
+//   try {
+//     const courses = await coursesModel
+//       .find({ "enrolledLearners.learner": req.user.id })
+//       .select("title poster enrolledLearners");
+
+//     const enrollments = courses.map((course) => {
+//       const entry = course.enrolledLearners.find((e) => e.learner.toString() === req.user.id);
+//       return {
+//         course: { _id: course._id, title: course.title, poster: course.poster },
+//         status: entry?.status,
+//       };
+//     });
+
+//     res.status(200).json({ success: true, count: enrollments.length, enrollments });
+//   } catch (error) {
+//     res.status(500).json({ success: false, msg: "Failed to fetch your enrollments", ERR: error.message });
+//   }
+// };

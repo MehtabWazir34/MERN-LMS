@@ -7,8 +7,16 @@ import {
   loginLearner,
   googleAuthLearner,
   logoutLearner,
-  getMyEnrolledCourses
+  getMyEnrollments,
+  updateMyProfile,
+  
+  // getMyEnrolledCourses,
+  
 } from '../controllers/learnerCtrls.js';
+import { optionalAuth } from '../middleware/optionalAuth.js';
+import { getCourseById } from '../controllers/courseCtrls.js';
+import { uploadImgsStorage } from '../config/multer.js';
+// getMyEnrollments
 
 const learnerRouter = express.Router();
 
@@ -23,10 +31,11 @@ learnerRouter.post('/google-auth', googleAuthLearner);
 learnerRouter.post('/logout', authCheck, restrictTo('learner'), logoutLearner);
 
 /* SELF-SERVICE (protected) */
-learnerRouter.get('/my-courses', authCheck, restrictTo('learner'), getMyEnrolledCourses);
-
+learnerRouter.get('/my-courses', authCheck, restrictTo('learner'), getMyEnrollments);
+learnerRouter.get('/my-enrollments', authCheck, restrictTo('learner'), getMyEnrollments);
+learnerRouter.get('/:id', optionalAuth, getCourseById);
 // Attendance/result history for a learner (getMyAttendance, getMyResults)
 // live in attendanceRoutes.js and resultRoutes.js — kept with their
 // domain instead of here, same reasoning as the models being separated.
-
+learnerRouter.patch('/profile', authCheck, restrictTo('learner'), uploadImgsStorage.single('pic'), updateMyProfile);
 export default learnerRouter;

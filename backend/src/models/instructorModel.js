@@ -14,7 +14,9 @@ const Schema = new mongoose.Schema({
     role: { type: String, default: "instructor", immutable: true },
     about: { type: String, default: "" },
     courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
-    verifiedStatus: { type: Boolean, default: false }
+    verifiedStatus: { type: Boolean, default: false },
+    contactNumber: { type: String, default: "" },
+    address: { type: String, default: "" },
 }, { timestamps: true });
 
 export const instructorModel = mongoose.model("Instructor", Schema);

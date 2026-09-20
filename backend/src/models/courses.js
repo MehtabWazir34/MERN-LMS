@@ -11,6 +11,8 @@ const videoSchema = new mongoose.Schema({
 const enrollmentSchema = new mongoose.Schema({
     learner: { type: mongoose.Schema.Types.ObjectId, ref: "Learner", required: true },
     status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+    contactNumber: { type: String, default: "" },
+    address: { type: String, default: "" },
 }, { timestamps: true });
 
 const courseSchema = new mongoose.Schema({

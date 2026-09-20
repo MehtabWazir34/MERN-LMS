@@ -7,7 +7,8 @@ import {
   resendInstructorVerification,
   loginInstructor,
   googleAuthInstructor,
-  logoutInstructor
+  logoutInstructor,
+  updateMyProfile
 } from '../controllers/instructorCtrls.js';
 
 const instructorRouter = express.Router();
@@ -26,5 +27,5 @@ instructorRouter.post('/logout', authCheck, restrictTo('instructor'), logoutInst
 // for an instructor's own courses live in courseRoutes.js, attendanceRoutes.js
 // and resultRoutes.js — guarded there by restrictTo('instructor', 'admin')
 // plus the ownership check inside each controller.
-
+instructorRouter.patch('/profile', authCheck, restrictTo('instructor'), uploadImgsStorage.single('pic'), updateMyProfile);
 export default instructorRouter;

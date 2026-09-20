@@ -1,52 +1,93 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import PublicLayout from "../../components/layout/Publiclayout.jsx";
-import Button from "../../components/common/Button";
-import Alert from "../../components/common/Alert";
-import Spinner from "../../components/common/Spinner";
+import PublicLayout from "../../components/layout/Publiclayout";
+import Button from "../../components/common/Button.jsx";
+import Input from "../../components/common/Input.jsx";
+import Alert from "../../components/common/Alert.jsx";
+import Spinner from "../../components/common/Spinner.jsx";
+import Modal from "../../components/layout/Modal.jsx";
 import { getCourseById, requestEnroll } from "../../api/courses";
 import { useAuth } from "../../context/AuthContext";
 import { ROLES } from "../../utils/roles";
 
+const EMPTY_ENROLL_FORM = { contactNumber: "", address: "" };
+
 export default function CourseDetailPage() {
     const { id } = useParams();
-    const { isAuthenticated, role } = useAuth();
+    const { isAuthenticated, role, user } = useAuth();
 
     const [course, setCourse] = useState(null);
     const [status, setStatus] = useState("loading"); // loading | success | error
+
+    const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
+    const [enrollForm, setEnrollForm] = useState(EMPTY_ENROLL_FORM);
+    const [enrollErrors, setEnrollErrors] = useState({});
     const [enrollBanner, setEnrollBanner] = useState(null);
     const [isEnrolling, setIsEnrolling] = useState(false);
     const [justRequested, setJustRequested] = useState(false);
 
     useEffect(() => {
+        const controller = new AbortController();
+
         const load = async () => {
             setStatus("loading");
             try {
-                const data = await getCourseById(id);
+                const data = await getCourseById(id, { signal: controller.signal });
+                console.log("Details:", data);
+                
                 setCourse(data.course);
                 setStatus("success");
-            } catch {
+            } catch (err) {
+                if (err.code === "ERR_CANCELED") return;
                 setStatus("error");
             }
         };
+
         load();
+        return () => controller.abort();
     }, [id]);
 
-    const handleEnroll = async () => {
+    const openEnrollModal = () => {
+        setEnrollForm(EMPTY_ENROLL_FORM);
+        setEnrollErrors({});
+        setIsEnrollModalOpen(true);
+    };
+
+    const closeEnrollModal = () => setIsEnrollModalOpen(false);
+
+    const handleEnrollFormChange = (e) => {
+        const { name, value } = e.target;
+        setEnrollForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const validateEnrollForm = () => {
+        const next = {};
+        if (!enrollForm.contactNumber.trim()) next.contactNumber = "Contact number is required";
+        if (!enrollForm.address.trim()) next.address = "Address is required";
+        setEnrollErrors(next);
+        return Object.keys(next).length === 0;
+    };
+
+    const handleEnrollSubmit = async (e) => {
+        e.preventDefault();
+        if (!validateEnrollForm()) return;
+
         setIsEnrolling(true);
         setEnrollBanner(null);
         try {
-            const data = await requestEnroll(id);
+            const data = await requestEnroll(id, enrollForm);
             setEnrollBanner({ variant: "success", message: data.msg });
             setJustRequested(true);
+            closeEnrollModal();
         } catch (err) {
             // Covers the 409 "already pending/approved/rejected" case too —
             // the backend's message already says which, no separate status
-            // check needed (see chat note on why there's no such endpoint yet).
+            // check needed.
             setEnrollBanner({
                 variant: "danger",
                 message: err.response?.data?.msg || "Failed to send enrollment request",
             });
+            closeEnrollModal();
         } finally {
             setIsEnrolling(false);
         }
@@ -116,7 +157,7 @@ export default function CourseDetailPage() {
                     )}
 
                     {showEnrollCta && (
-                        <Button onClick={handleEnroll} isLoading={isEnrolling} disabled={justRequested}>
+                        <Button onClick={openEnrollModal} disabled={justRequested}>
                             {justRequested ? "Request sent" : "Request to enroll"}
                         </Button>
                     )}
@@ -145,6 +186,45 @@ export default function CourseDetailPage() {
                     )}
                 </div>
             </div>
+
+            <Modal isOpen={isEnrollModalOpen} onClose={closeEnrollModal} title="Enrollment details">
+                <form onSubmit={handleEnrollSubmit} className="space-y-4">
+                    <Input id="enroll-name" label="Name" value={user?.name ?? ""} disabled />
+                    <Input id="enroll-email" label="Email" value={user?.email ?? ""} disabled />
+                    <Input
+                        id="enroll-contact"
+                        name="contactNumber"
+                        label="Contact number"
+                        value={enrollForm.contactNumber}
+                        onChange={handleEnrollFormChange}
+                        error={enrollErrors.contactNumber}
+                    />
+                    <div className="w-full">
+                        <label htmlFor="enroll-address" className="mb-1.5 block text-sm font-medium text-text-secondary">
+                            Address
+                        </label>
+                        <textarea
+                            id="enroll-address"
+                            name="address"
+                            rows={3}
+                            value={enrollForm.address}
+                            onChange={handleEnrollFormChange}
+                            className={`w-full rounded-md border bg-surface px-3.5 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/40 ${enrollErrors.address ? "border-danger" : "border-border"
+                                }`}
+                        />
+                        {enrollErrors.address && <p className="mt-1.5 text-xs text-danger">{enrollErrors.address}</p>}
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button type="button" variant="secondary" fullWidth={false} onClick={closeEnrollModal}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" fullWidth={false} isLoading={isEnrolling}>
+                            Send request
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
         </PublicLayout>
     );
 }
