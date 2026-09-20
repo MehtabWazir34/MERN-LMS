@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import DashboardShell from "../../components/layout/DashboardShell";
+import DashboardShell from "../../components/layout/Dashboardshell";
 import Button from "../../components/common/Button";
 import Spinner from "../../components/common/Spinner";
 import Alert from "../../components/common/Alert";

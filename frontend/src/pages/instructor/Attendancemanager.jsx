@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
 import { getEnrollmentRequests } from "../../api/courses";
-import { markAttendance, updateAttendance, getCourseAttendance } from "../../api/attendance";
+import { markAttendance, updateAttendance, getCourseAttendance } from "../../api/Attendance";
 
 const STATUS_LABELS = { P: "Present", A: "Absent", L: "Late" };
 const STATUS_ORDER = ["P", "A", "L"];

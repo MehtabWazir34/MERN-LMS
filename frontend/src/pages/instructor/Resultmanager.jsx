@@ -4,7 +4,7 @@ import Button from "../../components/common/Button.jsx";
 import Alert from "../../components/common/Alert.jsx";
 import Spinner from "../../components/common/Spinner.jsx";
 import { getEnrollmentRequests } from "../../api/courses";
-import { addResult, updateResult, getCourseResults } from "../../api/results";
+import { addResult, updateResult, getCourseResults } from "../../api/Results.js";
 
 const EMPTY_FORM = { learnerId: "", resultTitle: "", obtainedMarks: "", totalMarks: "" };
 
