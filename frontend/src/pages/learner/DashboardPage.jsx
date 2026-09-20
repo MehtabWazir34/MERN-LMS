@@ -2,6 +2,7 @@ import { useState } from "react";
 import DashboardShell from "../../components/layout/Dashboardshell.jsx";
 import MyCourses from "./MyCourses.jsx";
 import MyRequests from "./MyRequests.jsx";
+import { Link } from "react-router-dom";
 
 const TABS = [
     { key: "courses", label: "My Courses" },
@@ -13,6 +14,9 @@ export default function LearnerDashboardPage() {
 
     return (
         <DashboardShell title="Learner dashboard">
+            <Link to="/" className="text-sm font-medium text-primary hover:bg-surface-hover border-border bg-surface p-2 rounded-lg ">
+                ← Back to Home
+            </Link>
             <div
                 className="flex gap-1 rounded-md border border-border bg-surface p-1"
                 style={{ width: "fit-content" }}

@@ -6,8 +6,8 @@ export default function DashboardShell({ title, children }) {
 
     return (
         <div className="min-h-screen bg-background">
-            <header className="flex items-center justify-between border-b border-border bg-surface px-6 py-4">
-                <span className="font-display text-lg text-primary">Ledger LMS</span>
+            <header className="flex items-center justify-end md:justify-between border-b border-border bg-surface px-6 py-4">
+                <span className="font-display text-lg text-primary hidden md:block">Ledger LMS</span>
                 <div className="flex items-center gap-4">
                     <span className="text-sm text-text-secondary">
                         {user?.name} <span className="text-text-muted">·</span>{" "}

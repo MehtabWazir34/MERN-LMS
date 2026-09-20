@@ -3,6 +3,7 @@ import DashboardShell from "../../components/layout/Dashboardshell";
 import InstructorTable from "./Instructortable.jsx";
 import LearnerTable from "./Learnertable .jsx";
 import AdminTable from "./Admintable";
+import { Link } from "react-router-dom";
 
 const TABS = [
     { key: "instructors", label: "Instructors" },
@@ -15,7 +16,10 @@ export default function AdminDashboardPage() {
 
     return (
         <DashboardShell title="Admin dashboard">
-            <div className="flex gap-1 rounded-md border border-border bg-surface p-1" style={{ width: "fit-content" }}>
+            <Link to="/" className="text-sm font-medium text-primary hover:underline border-border bg-surface p-2 rounded-lg ">
+                                       ← Back to Home
+                                    </Link>
+            <div className="flex gap-1 rounded-md border border-border bg-surface p-1 my-4" style={{ width: "fit-content" }}>
                 {TABS.map((tab) => (
                     <button
                         key={tab.key}

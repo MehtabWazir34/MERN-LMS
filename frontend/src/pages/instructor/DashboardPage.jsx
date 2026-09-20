@@ -69,10 +69,10 @@ export default function InstructorDashboardPage() {
 
     return (
         <DashboardShell title="Instructor dashboard">
-            <Link to="/" className="text-sm font-medium text-primary hover:underline border-border bg-surface p-2 rounded-lg ">
+            <Link to="/" className="text-sm font-medium text-primary hover:bg-surface-hover border-border bg-surface p-2 rounded-lg ">
                            ← Back to Home
                         </Link>
-            <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 my-4">
                 <p>Your courses, enrollment requests, grading.</p>
                 <Button fullWidth={false} onClick={() => navigate("/instructor/courses/new")}>
                     + Create course

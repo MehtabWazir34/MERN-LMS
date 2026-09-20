@@ -6,6 +6,7 @@ import Alert from "../components/common/Alert.jsx";
 import { updateMyProfile } from "../api/profile.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { ROLES } from "../utils/roles.js";
+import { Link } from "react-router-dom";
 
 export default function ProfilePage() {
     const { user, role, updateUser } = useAuth();
@@ -51,21 +52,24 @@ export default function ProfilePage() {
 
     return (
         <DashboardShell title="My Profile">
+            <Link to="/" className="text-sm font-medium text-primary hover:bg-surface-hover border-border bg-surface p-2 rounded-lg ">
+                                       ← Back to Home
+                                    </Link>
             {banner && (
-                <div className="mb-4 max-w-lg">
+                <div className=" max-w-lg">
                     <Alert variant={banner.variant}>{banner.message}</Alert>
                 </div>
             )}
 
             {isLocked ? (
-                <div className="max-w-lg space-y-4">
+                <div className="max-w-lg space-y-4 mt-4">
                     <Alert variant="info">
                         Your profile can only be edited once, and that edit has already been used. Contact an admin
                         if anything needs to change.
                     </Alert>
-                    <div className="rounded-lg border border-border bg-surface p-4">
+                    <div className="rounded-lg border border-border bg-surface p-4 my-4 ">
                         {user?.pic && (
-                            <img src={user.pic} alt={user.name} className="mb-4 h-24 w-24 rounded-full object-cover" />
+                            <img src={user.pic} alt={user.name} className="my-4 h-24 w-24 rounded-full object-cover mx-auto" />
                         )}
                         <dl className="space-y-2 text-sm">
                             <div>
@@ -96,16 +100,17 @@ export default function ProfilePage() {
                         </Alert>
                     )}
 
-                    <div className="w-full">
-                        <label className="mb-1.5 block text-sm font-medium text-text-secondary">Profile photo</label>
+                    <div className="w-full flex flex-col items-center">
                         {user?.pic && !pic && (
-                            <img src={user.pic} alt={user.name} className="mb-2 h-20 w-20 rounded-full object-cover" />
+                            <img src={user.pic} alt={user.name} className="mb-2 h-24 w-24 rounded-full object-cover border" />
                         )}
-                        <input
+                        <label htmlFor="pic" className="mb-1.5 block text-sm font-medium text-text-secondary my-4 border-border border rounded-lg cursor-pointer p-1">Profile photo</label>
+                        <input 
+                            id="pic"
                             type="file"
                             accept="image/*"
                             onChange={(e) => setPic(e.target.files?.[0] ?? null)}
-                            className="w-full text-sm text-text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-2 file:text-sm file:font-medium file:text-text-primary"
+                            className="hidden "
                         />
                     </div>
 
