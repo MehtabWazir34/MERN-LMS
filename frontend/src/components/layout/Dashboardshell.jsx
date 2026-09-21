@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Button from "../common/Button";
 import { useAuth } from "../../context/AuthContext";
 
@@ -6,13 +7,13 @@ export default function DashboardShell({ title, children }) {
 
     return (
         <div className="min-h-screen bg-background">
-            <header className="flex items-center justify-end md:justify-between border-b border-border bg-surface px-6 py-4">
-                <span className="font-display text-lg text-primary hidden md:block">Ledger LMS</span>
+            <header className="flex items-center justify-between border-b border-border bg-surface px-6 py-4">
+                <span className="font-display text-lg text-primary">Ledger LMS</span>
                 <div className="flex items-center gap-4">
-                    <span className="text-sm text-text-secondary">
+                    <Link to="/profile" className="text-sm text-text-secondary transition-colors hover:text-text-primary">
                         {user?.name} <span className="text-text-muted">·</span>{" "}
                         <span className="capitalize">{user?.role}</span>
-                    </span>
+                    </Link>
                     <Button variant="secondary" fullWidth={false} onClick={logout}>
                         Logout
                     </Button>

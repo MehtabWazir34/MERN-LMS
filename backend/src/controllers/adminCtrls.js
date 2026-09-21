@@ -271,7 +271,7 @@ export const getLearnerById = async (req, res) => {
 
 export const updateLearnerByAdmin = async (req, res) => {
   try {
-    const { name, pic, verifiedStatus } = req.body;
+    const { name, pic, verifiedStatus,} = req.body;
     const learner = await learnerModel.findByIdAndUpdate(
       req.params.id,
       { $set: { name, pic, verifiedStatus } },
