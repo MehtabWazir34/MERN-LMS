@@ -38,12 +38,12 @@ adminRouter.post('/logout', authCheck, restrictTo('admin'), logoutAdmin);
 /*  MANAGEMENT (admin only)  */
 adminRouter.get('/instructors', authCheck, restrictTo('admin'), getAllInstructors);
 adminRouter.get('/instructors/:id', authCheck, restrictTo('admin'), getInstructorById);
-adminRouter.patch('/instructors/:id', authCheck, restrictTo('admin'), updateInstructorByAdmin);
+adminRouter.patch('/instructors/:id', authCheck, restrictTo('admin'), uploadImgsStorage.single("pic"), updateInstructorByAdmin);
 adminRouter.delete('/instructors/:id', authCheck, restrictTo('admin'), deleteInstructorByAdmin);
 
 adminRouter.get('/learners', authCheck, restrictTo('admin'), getAllLearners);
 adminRouter.get('/learners/:id', authCheck, restrictTo('admin'), getLearnerById);
-adminRouter.patch('/learners/:id', authCheck, restrictTo('admin'), updateLearnerByAdmin);
+adminRouter.patch('/learners/:id', authCheck, restrictTo('admin'), uploadImgsStorage.single("pic"), updateLearnerByAdmin);
 adminRouter.delete('/learners/:id', authCheck, restrictTo('admin'), deleteLearnerByAdmin);
 adminRouter.get('/learners/:id/attendance', authCheck, restrictTo('admin'), getLearnerAttendanceByAdmin);
 adminRouter.get('/learners/:id/results', authCheck, restrictTo('admin'), getLearnerResultsByAdmin);

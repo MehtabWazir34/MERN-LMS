@@ -218,10 +218,13 @@ export const updateInstructorByAdmin = async (req, res) => {
     // is the same "never trust client-set role/verifiedStatus" principle
     // from the earlier privilege-escalation fix, just applied to admin's
     // own edit endpoint too.
-    const { name, about, pic, verifiedStatus } = req.body;
+    const { name, about, contactNumber, address, verifiedStatus } = req.body;
+    const update = { name, about, contactNumber, address, verifiedStatus };
+    if (req.file) update.pic = await uploadToCloudinary(req.file.path, "profile-pics");
+
     const instructor = await instructorModel.findByIdAndUpdate(
       req.params.id,
-      { $set: { name, about, pic, verifiedStatus } },
+      { $set: update },
       { new: true, runValidators: true }
     ).select("-password");
 
@@ -271,10 +274,13 @@ export const getLearnerById = async (req, res) => {
 
 export const updateLearnerByAdmin = async (req, res) => {
   try {
-    const { name, pic, verifiedStatus,} = req.body;
+    const { name, contactNumber, address, verifiedStatus } = req.body;
+    const update = { name, contactNumber, address, verifiedStatus };
+    if (req.file) update.pic = await uploadToCloudinary(req.file.path, "profile-pics");
+
     const learner = await learnerModel.findByIdAndUpdate(
       req.params.id,
-      { $set: { name, pic, verifiedStatus } },
+      { $set: update },
       { new: true, runValidators: true }
     ).select("-password");
 

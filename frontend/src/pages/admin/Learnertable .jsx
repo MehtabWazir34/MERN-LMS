@@ -13,6 +13,8 @@ import {
     getLearnerResults,
 } from "../../api/admin";
 
+const EMPTY_EDIT_FORM = { name: "", contactNumber: "", address: "", verifiedStatus: false };
+
 export default function LearnerTable() {
     const [learners, setLearners] = useState([]);
     const [status, setStatus] = useState("loading"); // loading | success | error
@@ -21,7 +23,8 @@ export default function LearnerTable() {
 
     // Edit modal
     const [editTarget, setEditTarget] = useState(null); // the learner object, or null when closed
-    const [editForm, setEditForm] = useState({ name: "", verifiedStatus: false });
+    const [editForm, setEditForm] = useState(EMPTY_EDIT_FORM);
+    const [editPic, setEditPic] = useState(null);
     const [isSavingEdit, setIsSavingEdit] = useState(false);
 
     // Academics modal
@@ -50,7 +53,13 @@ export default function LearnerTable() {
     }, []);
 
     const openEdit = (learner) => {
-        setEditForm({ name: learner.name, verifiedStatus: Boolean(learner.verifiedStatus) });
+        setEditForm({
+            name: learner.name,
+            contactNumber: learner.contactNumber || "",
+            address: learner.address || "",
+            verifiedStatus: Boolean(learner.verifiedStatus),
+        });
+        setEditPic(null);
         setEditTarget(learner);
     };
 
@@ -66,7 +75,9 @@ export default function LearnerTable() {
         setBanner(null);
         setIsSavingEdit(true);
         try {
-            const data = await updateLearner(editTarget._id, editForm);
+            const payload = { ...editForm };
+            if (editPic) payload.pic = editPic;
+            const data = await updateLearner(editTarget._id, payload);
             setLearners((prev) => prev.map((l) => (l._id === editTarget._id ? { ...l, ...data.learner } : l)));
             closeEdit();
         } catch (err) {
@@ -142,15 +153,22 @@ export default function LearnerTable() {
                             key={learner._id}
                             className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4"
                         >
-                            <div className="min-w-0">
-                                <p className="truncate font-medium text-text-primary">{learner.name}</p>
-                                <p className="truncate text-sm text-text-secondary">{learner.email}</p>
-                                <p className="mt-1 text-xs text-text-muted">
-                                    {learner.enrolledCourses?.length ?? 0} enrolled course(s) ·{" "}
-                                    <span className={learner.verifiedStatus ? "text-success" : "text-warning"}>
-                                        {learner.verifiedStatus ? "Verified" : "Unverified"}
-                                    </span>
-                                </p>
+                            <div className="flex min-w-0 items-center gap-3">
+                                {learner.pic ? (
+                                    <img src={learner.pic} alt={learner.name} className="h-10 w-10 flex-shrink-0 rounded-full object-cover" />
+                                ) : (
+                                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-surface-hover" />
+                                )}
+                                <div className="min-w-0">
+                                    <p className="truncate font-medium text-text-primary">{learner.name}</p>
+                                    <p className="truncate text-sm text-text-secondary">{learner.email}</p>
+                                    <p className="mt-1 text-xs text-text-muted">
+                                        {learner.enrolledCourses?.length ?? 0} enrolled course(s) ·{" "}
+                                        <span className={learner.verifiedStatus ? "text-success" : "text-warning"}>
+                                            {learner.verifiedStatus ? "Verified" : "Unverified"}
+                                        </span>
+                                    </p>
+                                </div>
                             </div>
                             <div className="flex flex-shrink-0 flex-wrap gap-2">
                                 <button
@@ -183,11 +201,49 @@ export default function LearnerTable() {
 
             <Modal isOpen={Boolean(editTarget)} onClose={closeEdit} title={`Edit ${editTarget?.name ?? ""}`}>
                 <form onSubmit={handleEditSubmit} className="space-y-4">
-                    <Input id="edit-learner-name" name="name" label="Name" value={editForm.name} onChange={handleEditChange} />
+                    <div className="w-full">
+                        <label className="mb-1.5 block text-sm font-medium text-text-secondary">Profile photo</label>
+                        {editTarget?.pic && !editPic && (
+                            <img src={editTarget.pic} alt={editTarget.name} className="mb-2 h-16 w-16 rounded-full object-cover" />
+                        )}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setEditPic(e.target.files?.[0] ?? null)}
+                            className="w-full text-sm text-text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-surface-hover file:px-3 file:py-2 file:text-sm file:font-medium file:text-text-primary"
+                        />
+                    </div>
+
+                    <Input id="learner-name" name="name" label="Name" value={editForm.name} onChange={handleEditChange} />
+                    <Input id="learner-email" label="Email" value={editTarget?.email ?? ""} disabled />
+
+                    <Input
+                        id="learner-contact"
+                        name="contactNumber"
+                        label="Contact number"
+                        value={editForm.contactNumber}
+                        onChange={handleEditChange}
+                    />
+
+                    <div className="w-full">
+                        <label htmlFor="learner-address" className="mb-1.5 block text-sm font-medium text-text-secondary">
+                            Address
+                        </label>
+                        <textarea
+                            id="learner-address"
+                            name="address"
+                            rows={2}
+                            value={editForm.address}
+                            onChange={handleEditChange}
+                            className="w-full rounded-md border border-border bg-surface px-3.5 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
+                        />
+                    </div>
+
                     <label className="flex items-center gap-2 text-sm text-text-secondary">
                         <input type="checkbox" name="verifiedStatus" checked={editForm.verifiedStatus} onChange={handleEditChange} />
                         Verified
                     </label>
+
                     <div className="flex justify-end gap-2 pt-2">
                         <Button type="button" variant="secondary" fullWidth={false} onClick={closeEdit}>
                             Cancel

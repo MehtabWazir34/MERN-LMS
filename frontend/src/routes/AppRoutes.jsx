@@ -14,7 +14,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./Guestroute";
 import { ROLES } from "../utils/roles.js";
 import ProfilePage from "../pages/ProfilePage.jsx";
-// ProfilePage
+import NotFoundPage from "../pages/public/NotFoundPage.jsx";
 
 export default function AppRoutes() {
     return (
@@ -100,9 +100,9 @@ export default function AppRoutes() {
                 }
             />
 
-            {/* Unmatched paths land on the homepage now that it's real content,
-          rather than forcing a signin redirect. */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Unmatched paths get an actual 404 now instead of a silent
+          redirect to home. */}
+            <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );
 }

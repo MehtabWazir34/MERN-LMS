@@ -1,14 +1,28 @@
 import { http } from "./http";
 
+const buildFormData = (data) => {
+  const formData = new FormData();
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      formData.append(key, value);
+    }
+  });
+  return formData;
+};
+
 export const getAllInstructors = async (config = {}) => {
   const res = await http.get("/admin/instructors", config);
   return res.data; // { success, count, instructors }
 };
 
-// Only name/about/verifiedStatus are accepted by updateInstructorByAdmin —
-// role, password, email, authMethod are intentionally locked server-side.
+// name/about/contactNumber/address/verifiedStatus/pic accepted by
+// updateInstructorByAdmin — role, password, email, authMethod are
+// intentionally locked server-side. Multipart since pic is a File.
 export const updateInstructor = async (id, data) => {
-  const res = await http.patch(`/admin/instructors/${id}`, data);
+  const formData = buildFormData(data);
+  const res = await http.patch(`/admin/instructors/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return res.data; // { success, msg, instructor }
 };
 
@@ -22,9 +36,12 @@ export const getAllLearners = async (config = {}) => {
   return res.data; // { success, count, learners }
 };
 
-// Only name/pic/verifiedStatus accepted by updateLearnerByAdmin.
+// name/contactNumber/address/verifiedStatus/pic accepted by updateLearnerByAdmin.
 export const updateLearner = async (id, data) => {
-  const res = await http.patch(`/admin/learners/${id}`, data);
+  const formData = buildFormData(data);
+  const res = await http.patch(`/admin/learners/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return res.data; // { success, msg, learner }
 };
 
