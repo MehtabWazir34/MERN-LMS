@@ -56,10 +56,14 @@ export default function Navbar() {
                         <Link
                             to="/"
                             className="hover:text-text-primary"
-                        >
-                            Home
-                        </Link>
+                        > Home  </Link>
 
+                        <Link
+                            to="/about"
+                            className="hover:text-text-primary"
+                        >
+                            About
+                        </Link>
                         <Link
                             to="/courses"
                             className="hover:text-text-primary"
@@ -166,17 +170,18 @@ export default function Navbar() {
                                 to="/"
                                 onClick={() => setIsMenuOpen(false)}
                                 className="rounded-md px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-border/40 hover:text-text-primary"
-                            >
-                                Home
-                            </Link>
+                            > Home </Link>
 
+                            <Link
+                                to="/about"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="rounded-md px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-border/40 hover:text-text-primary"
+                            > About </Link>
                             <Link
                                 to="/courses"
                                 onClick={() => setIsMenuOpen(false)}
                                 className="rounded-md px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-border/40 hover:text-text-primary"
-                            >
-                                Courses
-                            </Link>
+                            > Courses </Link>
 
                             {isAuthenticated ? (
                                 <>

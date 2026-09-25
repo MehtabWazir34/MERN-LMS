@@ -244,7 +244,7 @@ export default function LectureManager({ courseId, videos, onVideosChange }) {
                                         <p className="mt-1 text-sm text-text-secondary">{video.description}</p>
                                         {video.duration ? <p className="mt-1 text-xs text-text-muted">{video.duration} min</p> : null}
                                     </div>
-                                    <div className="flex flex-shrink-0 gap-2">
+                                    <div className="flex shrink-0 gap-2">
                                         <button
                                             type="button"
                                             onClick={() => startEdit(video)}

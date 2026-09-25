@@ -20,7 +20,6 @@ export default function MyRequests() {
             setStatus("loading");
             try {
                 const data = await getMyEnrollments({ signal: controller.signal });
-                console.log("RData:", data);
                 if(data?.success){
                     setEnrollments(data?.enrollments);
                 } 

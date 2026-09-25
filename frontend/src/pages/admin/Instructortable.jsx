@@ -151,9 +151,9 @@ export default function InstructorTable() {
                         >
                             <div className="flex min-w-0 items-center gap-3">
                                 {instructor.pic ? (
-                                    <img src={instructor.pic} alt={instructor.name} className="h-10 w-10 flex-shrink-0 rounded-full object-cover" />
+                                    <img src={instructor.pic} alt={instructor.name} className="h-10 w-10 shrink-0 rounded-full object-cover" />
                                 ) : (
-                                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-surface-hover" />
+                                    <div className="h-10 w-10 shrink-0 rounded-full bg-surface-hover" />
                                 )}
                                 <div className="min-w-0">
                                     <p className="truncate font-medium text-text-primary">{instructor.name}</p>
@@ -166,7 +166,7 @@ export default function InstructorTable() {
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex flex-shrink-0 flex-wrap gap-2">
+                            <div className="flex shrink-0 flex-wrap gap-2">
                                 <button
                                     type="button"
                                     onClick={() => openCourses(instructor)}
@@ -293,7 +293,7 @@ export default function InstructorTable() {
                                 className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-surface p-3"
                             >
                                 <span className="min-w-0 truncate text-sm font-medium text-text-primary">{course.title}</span>
-                                <div className="flex flex-shrink-0 gap-2">
+                                <div className="flex shrink-0 gap-2">
                                     <Link
                                         to={`/instructor/courses/${course._id}/manage`}
                                         className="rounded-md border border-border bg-surface px-2.5 py-1 text-xs font-medium text-text-primary transition-colors hover:bg-surface-hover"

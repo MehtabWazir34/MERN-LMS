@@ -15,6 +15,7 @@ import GuestRoute from "./Guestroute";
 import { ROLES } from "../utils/roles.js";
 import ProfilePage from "../pages/ProfilePage.jsx";
 import NotFoundPage from "../pages/public/NotFoundPage.jsx";
+import AboutPage from "../pages/public/About.jsx";
 
 export default function AppRoutes() {
     return (
@@ -24,7 +25,7 @@ export default function AppRoutes() {
             <Route path="/" element={<HomePage />} />
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/courses/:id" element={<CourseDetailPage />} />
-
+            <Route path="/about" element={<AboutPage/>} />
             <Route
                 path="/signup"
                 element={

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export default function Modal({ isOpen, onClose, title, children }) {
+export default function Modal({ isOpen, onClose, title, maxWidth = "max-w-lg", children }) {
     useEffect(() => {
         if (!isOpen) return;
 
@@ -32,7 +32,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
                 aria-modal="true"
                 aria-label={title}
                 onClick={(e) => e.stopPropagation()}
-                className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-surface p-6 shadow-lg"
+                className={`max-h-[90vh] w-full ${maxWidth} overflow-y-auto rounded-lg bg-surface p-6 shadow-lg`}
             >
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="font-display text-lg text-text-primary">{title}</h3>
@@ -40,7 +40,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
                         type="button"
                         onClick={onClose}
                         aria-label="Close"
-                        className="rounded-md p-1 text-xl leading-none text-text-muted transition-colors hover:bg-surface-hover hover:text-text-primary"
+                        className="rounded-md p-1 text-xl leading-none text-text-muted transition-colors hover:bg-surface-hover hover:text-text-primary cursor-pointer"
                     >
                         ✕
                     </button>

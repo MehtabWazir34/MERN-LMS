@@ -14,8 +14,6 @@ const googleClient = new OAuth2Client(env.googleClientID);
 
 export const registerLearner = async (req, res) => {
   try {
-    console.log("SMTP_USER:", JSON.stringify(env.smtpUser));
-    console.log("SMTP_PASS length:", env.smtpPass?.length);
     const { email, name, password } = req.body;
     if (!email || !name || !password) {
       return res.status(400).json({ success: false, msg: "Name, email and password are required" });

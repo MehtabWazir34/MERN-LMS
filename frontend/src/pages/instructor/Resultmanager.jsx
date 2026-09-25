@@ -278,7 +278,7 @@ export default function ResultManager({ courseId }) {
                                         <p className="truncate font-medium text-text-primary">{result.learner?.name}</p>
                                         <p className="text-sm text-text-secondary">{result.resultTitle}</p>
                                     </div>
-                                    <div className="flex flex-shrink-0 items-center gap-3">
+                                    <div className="flex shrink-0 items-center gap-3">
                                         <span className="text-sm font-medium text-primary">
                                             {result.obtainedMarks}/{result.totalMarks}
                                         </span>

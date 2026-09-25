@@ -117,7 +117,7 @@ export default function InstructorDashboardPage() {
                                     <img
                                         src={course.poster}
                                         alt={course.title}
-                                        className="h-16 w-24 flex-shrink-0 rounded object-cover"
+                                        className="h-16 w-24 shrink-0 rounded object-cover"
                                     />
                                 )}
                             </div>

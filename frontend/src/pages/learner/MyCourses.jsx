@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
 import Modal from "../../components/layout/Modal";
 import { getMyEnrolledCourses } from "../../api/learner";
-import { getMyAttendance } from "../../api/Attendance";
-import { getMyResults } from "../../api/Results";
+import { getMyAttendance } from "../../api/attendance";
+import { getMyResults } from "../../api/results";
 
 export default function MyCourses() {
     const [courses, setCourses] = useState([]);
@@ -25,7 +26,8 @@ export default function MyCourses() {
                     getMyAttendance(undefined, { signal: controller.signal }),
                     getMyResults(undefined, { signal: controller.signal }),
                 ]);
-                setCourses(coursesData.enrollments.map(enro=> enro.course));
+                
+                setCourses(coursesData.enrollments.map(enrol=> enrol.course));
                 setAttendance(attendanceData.records);
                 setResults(resultsData.results);
                 setStatus("success");
@@ -77,20 +79,30 @@ export default function MyCourses() {
                         const percent = attendancePercentFor(course._id);
                         return (
                             <div key={course._id} className="flex flex-col overflow-hidden rounded-lg border border-border bg-surface">
-                                <div className="aspect-video w-full overflow-hidden bg-surface-hover">
-                                    {course.poster ? (
-                                        <img src={course.poster} alt={course.title} className="h-full w-full object-cover" />
-                                    ) : (
-                                        <div className="flex h-full w-full items-center justify-center text-sm text-text-muted">
-                                            No image
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="flex flex-1 flex-col gap-2 p-4">
-                                    <h3 className="line-clamp-2 font-display text-lg text-text-primary">{course.title}</h3>
-                                    <p className="text-sm text-text-secondary">
-                                        Attendance: {percent === null ? "—" : `${percent}%`}
-                                    </p>
+                                <Link to={`/courses/${course._id}`} className="group">
+                                    <div className="aspect-video w-full overflow-hidden bg-surface-hover">
+                                        {course.poster ? (
+                                            <img
+                                                src={course.poster}
+                                                alt={course.title}
+                                                className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="flex h-full w-full items-center justify-center text-sm text-text-muted">
+                                                No image
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-4 pb-0">
+                                        <h3 className="line-clamp-2 font-display text-lg text-text-primary group-hover:underline">
+                                            {course.title}
+                                        </h3>
+                                        <p className="mt-2 text-sm text-text-secondary">
+                                            Attendance: {percent === null ? "—" : `${percent}%`}
+                                        </p>
+                                    </div>
+                                </Link>
+                                <div className="flex flex-1 flex-col p-4">
                                     <button
                                         type="button"
                                         onClick={() => setResultsModalCourse(course)}

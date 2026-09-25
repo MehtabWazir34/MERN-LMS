@@ -155,9 +155,9 @@ export default function LearnerTable() {
                         >
                             <div className="flex min-w-0 items-center gap-3">
                                 {learner.pic ? (
-                                    <img src={learner.pic} alt={learner.name} className="h-10 w-10 flex-shrink-0 rounded-full object-cover" />
+                                    <img src={learner.pic} alt={learner.name} className="h-10 w-10 shrink-0 rounded-full object-cover" />
                                 ) : (
-                                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-surface-hover" />
+                                    <div className="h-10 w-10 shrink-0 rounded-full bg-surface-hover" />
                                 )}
                                 <div className="min-w-0">
                                     <p className="truncate font-medium text-text-primary">{learner.name}</p>
@@ -170,7 +170,7 @@ export default function LearnerTable() {
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex flex-shrink-0 flex-wrap gap-2">
+                            <div className="flex shrink-0 flex-wrap gap-2">
                                 <button
                                     type="button"
                                     onClick={() => openAcademics(learner)}

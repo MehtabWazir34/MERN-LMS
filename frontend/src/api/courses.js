@@ -26,7 +26,6 @@ export const getMyEnrollments = async (config = {}) => {
   // return res.data; // { success, count, enrollments }
   try {
     const res = await http.get("/course/my-enrollments", config);
-    console.log("Results Data:", res?.data);
     return res.data;
   } catch (error) {
     console.log("ERR:", error.message);

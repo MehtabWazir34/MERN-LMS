@@ -100,7 +100,7 @@ export default function AdminTable() {
                                     onClick={() => handleDelete(admin._id)}
                                     disabled={disableDelete || deletingId === admin._id}
                                     title={disabledReason}
-                                    className="flex-shrink-0 rounded-md border border-danger/30 bg-danger/10 px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-danger/20 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="shrink-0 rounded-md border border-danger/30 bg-danger/10 px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-danger/20 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {deletingId === admin._id ? "Removing…" : "Remove"}
                                 </button>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import PublicLayout from "../../components/layout/Publiclayout";
-import Button from "../../components/common/Button.jsx";
-import Input from "../../components/common/Input.jsx";
-import Alert from "../../components/common/Alert.jsx";
-import Spinner from "../../components/common/Spinner.jsx";
-import Modal from "../../components/layout/Modal.jsx";
+import Button from "../../components/common/Button";
+import Input from "../../components/common/Input";
+import Alert from "../../components/common/Alert";
+import Spinner from "../../components/common/Spinner";
+import Modal from "../../components/layout/Modal";
 import { getCourseById, requestEnroll } from "../../api/courses";
 import { useAuth } from "../../context/AuthContext";
 import { ROLES } from "../../utils/roles";
@@ -26,6 +26,8 @@ export default function CourseDetailPage() {
     const [isEnrolling, setIsEnrolling] = useState(false);
     const [justRequested, setJustRequested] = useState(false);
 
+    const [playingVideo, setPlayingVideo] = useState(null); // the video object, or null when closed
+
     useEffect(() => {
         const controller = new AbortController();
 
@@ -33,8 +35,6 @@ export default function CourseDetailPage() {
             setStatus("loading");
             try {
                 const data = await getCourseById(id, { signal: controller.signal });
-                console.log("Details:", data);
-                
                 setCourse(data.course);
                 setStatus("success");
             } catch (err) {
@@ -172,9 +172,21 @@ export default function CourseDetailPage() {
                         ) : (
                             <ul className="mt-4 space-y-2">
                                 {course.videos.map((video) => (
-                                    <li key={video._id} className="rounded-md border border-border bg-surface px-4 py-3">
-                                        <p className="font-medium text-text-primary">{video.title}</p>
-                                        <p className="text-sm text-text-secondary">{video.description}</p>
+                                    <li
+                                        key={video._id}
+                                        className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface px-4 py-3"
+                                    >
+                                        <div className="min-w-0">
+                                            <p className="font-medium text-text-primary">{video.title}</p>
+                                            <p className="text-sm text-text-secondary">{video.description}</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPlayingVideo(video)}
+                                            className="shrink-0 rounded-md bg-primary-btn px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-btn-hover cursor-pointer"
+                                        >
+                                            ▶ Play
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
@@ -224,6 +236,25 @@ export default function CourseDetailPage() {
                         </Button>
                     </div>
                 </form>
+            </Modal>
+
+            <Modal
+                isOpen={Boolean(playingVideo)}
+                onClose={() => setPlayingVideo(null)}
+                title={playingVideo?.title ?? ""}
+                maxWidth="max-w-3xl"
+            >
+                {playingVideo && (
+                    <video
+                        key={playingVideo._id}
+                        src={playingVideo.url}
+                        controls
+                        autoPlay
+                        className="w-full rounded-md bg-black"
+                    >
+                        Your browser doesn't support video playback.
+                    </video>
+                )}
             </Modal>
         </PublicLayout>
     );

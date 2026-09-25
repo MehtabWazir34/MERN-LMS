@@ -108,7 +108,7 @@ export default function EnrollmentManager({ courseId, view }) {
                                 <p className="truncate text-sm text-text-secondary">{enrollment.learner?.email}</p>
                             </div>
 
-                            <div className="flex flex-shrink-0 items-center gap-2">
+                            <div className="flex shrink-0 items-center gap-2">
                                 {view === "pending" && (
                                     <>
                                         <button
