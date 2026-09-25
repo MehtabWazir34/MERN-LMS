@@ -14,6 +14,8 @@ const googleClient = new OAuth2Client(env.googleClientID);
 
 export const registerLearner = async (req, res) => {
   try {
+    console.log("SMTP_USER:", JSON.stringify(env.smtpUser));
+    console.log("SMTP_PASS length:", env.smtpPass?.length);
     const { email, name, password } = req.body;
     if (!email || !name || !password) {
       return res.status(400).json({ success: false, msg: "Name, email and password are required" });
@@ -26,10 +28,10 @@ export const registerLearner = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, 10);
     const learner = new learnerModel({ name, email, password: hashPassword });
     await learner.save();
-
+    
     const verifyToken = generateEmailVerifyToken(learner._id, "learner");
     await sendVerificationEmail(learner.email, learner.name, `${env.clientUrl}/verify-email?token=${verifyToken}`);
-
+    
     const token = generateAuthToken(learner._id, "learner");
     learner.password = undefined;
 

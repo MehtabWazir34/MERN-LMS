@@ -35,3 +35,4 @@ smtpUser: process.env.SMTP_USER,
 smtpPass: process.env.SMTP_PASS,
 smtpFrom: process.env.SMTP_FROM,
 };
+console.log(process.env.SMTP_PASS);
