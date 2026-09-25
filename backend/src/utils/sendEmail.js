@@ -34,3 +34,42 @@ export const sendVerificationEmail = async (to, name, verifyLink) => {
     `
   });
 };
+export const sendEnrollmentRequestEmail = async (to, instructorName, learnerName, courseTitle, url) => {
+  await transporter.sendMail({
+    from: `"LMS" <${env.smtpFrom ?? "no-reply@lms.test"}>`,
+    to,
+    subject: `New enrollment request — ${courseTitle}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: auto;">
+        <h2>Hi ${instructorName},</h2>
+        <p><strong>${learnerName}</strong> has requested to enroll in your course "<strong>${courseTitle}</strong>".</p>
+        <p>
+          <a href="${url}" style="background:#2C5F4F;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;">
+            Review request
+          </a>
+        </p>
+      </div>
+    `
+  });
+};
+
+export const sendEnrollmentDecisionEmail = async (to, learnerName, courseTitle, decision, url) => {
+  const isApproved = decision === "approved";
+  await transporter.sendMail({
+    from: `"LMS" <${env.smtpFrom ?? "no-reply@lms.test"}>`,
+    to,
+    subject: `Your enrollment request was ${decision} — ${courseTitle}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: auto;">
+        <h2>Hi ${learnerName},</h2>
+        <p>Your request to enroll in "<strong>${courseTitle}</strong>" has been <strong>${isApproved ? "approved" : "rejected"}</strong>.</p>
+        ${isApproved ? "<p>You can now access the course content.</p>" : "<p>You're welcome to browse other courses.</p>"}
+        <p>
+          <a href="${url}" style="background:#2C5F4F;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;">
+            ${isApproved ? "Go to course" : "Browse courses"}
+          </a>
+        </p>
+      </div>
+    `
+  });
+};

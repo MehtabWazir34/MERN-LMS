@@ -2,7 +2,8 @@ import { coursesModel } from "../models/courses.js";
 import { instructorModel } from "../models/instructorModel.js";
 import { learnerModel } from "../models/learnerModel.js";
 import { uploadToCloudinary } from "../config/uploadToCloudinary.js";
-
+import { sendEnrollmentDecisionEmail, sendEnrollmentRequestEmail } from "../utils/sendEmail.js";
+import { env } from "../config/env.js";
 // True if the logged-in user owns this course, or is an admin overriding it.
 const canManageCourse = (course, user) => {
   return user.role === "admin" || course.instructor.toString() === user.id;
@@ -207,7 +208,7 @@ export const requestEnroll = async (req, res) => {
       return res.status(400).json({ success: false, msg: "Contact number and address are required" });
     }
 
-    const course = await coursesModel.findById(req.params.id);
+    const course = await coursesModel.findById(req.params.id).populate("instructor", "name email");
     if (!course) return res.status(404).json({ success: false, msg: "Course not found" });
 
     const existing = course.enrolledLearners.find((e) => e.learner.toString() === req.user.id);
@@ -227,6 +228,18 @@ export const requestEnroll = async (req, res) => {
     }
 
     await course.save();
+
+    // Best-effort notification — a failed email here must never fail the
+    // enrollment request itself, so it's not awaited into the main flow.
+    const learner = await learnerModel.findById(req.user.id).select("name");
+    sendEnrollmentRequestEmail(
+      course.instructor.email,
+      course.instructor.name,
+      learner?.name || "A learner",
+      course.title,
+      `${env.clientUrl}/instructor/courses/${course._id}/manage`
+    ).catch((err) => console.log({ msg: "Failed to send enrollment request notification", ERR: err.message }));
+
     res.status(201).json({ success: true, msg: "Enrollment request sent!, waiting for instructor approval" });
   } catch (error) {
     res.status(500).json({ success: false, msg: "Failed to request enrollment", ERR: error.message });
@@ -254,13 +267,16 @@ export const respondToEnrollment = async (req, res) => {
     enrollment.status = decision;
     await course.save();
 
-    // Keep the learner's own enrolledCourses list in sync so "my courses"
-    // queries stay correct without re-scanning every course document.
     if (decision === "approved") {
       await learnerModel.findByIdAndUpdate(enrollment.learner, { $addToSet: { enrolledCourses: course._id } });
     } else {
       await learnerModel.findByIdAndUpdate(enrollment.learner, { $pull: { enrolledCourses: course._id } });
     }
+    const learnerDoc = await learnerModel.findById(enrollment.learner).select("name email");
+    const learnerUrl = decision === "approved" ? `${env.clientUrl}/courses/${course._id}` : `${env.clientUrl}/courses`;
+
+    sendEnrollmentDecisionEmail(learnerDoc.email, learnerDoc.name, course.title, decision, learnerUrl)
+      .catch((err) => console.log({ msg: "Failed to send enrollment decision notification", ERR: err.message }));
 
     res.status(200).json({ success: true, msg: `Enrollment ${decision}!` });
   } catch (error) {
@@ -285,3 +301,4 @@ export const getEnrollmentRequests = async (req, res) => {
     res.status(500).json({ success: false, msg: "Failed to fetch enrollments", ERR: error.message });
   }
 };
+
