@@ -4,8 +4,8 @@ import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
 import Modal from "../../components/layout/Modal";
 import { getMyEnrollments } from "../../api/courses";
-import { getMyAttendance } from "../../api/attendance";
-import { getMyResults } from "../../api/results";
+import { getMyAttendance } from "../../api/Attendance.js";
+import { getMyResults } from "../../api/Results.js";
 
 export default function MyCourses() {
     const [courses, setCourses] = useState([]);
