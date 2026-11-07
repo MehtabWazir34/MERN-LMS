@@ -24,14 +24,13 @@ app.use(helmet());
 
 // The company site's origin is allowed on /lms/public only (read-only, no cookies).
 // Every other route accepts the LMS client alone, with credentials.
-const clinetLINK = env.clientUrl || "http://localhost:5173" || "http://localhost:5174";
-const companyLINK = "http://localhost:5174";
+
 const corsOptions = (req, callback) => {
   const isPublic = req.path.startsWith('/lms/public');
   callback(null, {
     origin: isPublic
-      ? [clinetLINK, companyLINK].flat().filter(Boolean)
-      : (clinetLINK),
+      ? [env.clientUrl, env.companySiteUrl].flat().filter(Boolean)
+      : (env.clientUrl),
     credentials: !isPublic,
   });
 };
