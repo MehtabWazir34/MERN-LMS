@@ -19,9 +19,9 @@ export default function AboutPage() {
     return (
         <PublicLayout>
             <div className="mx-auto max-w-3xl px-6 py-16">
-                <h1 className="font-display text-3xl text-text-primary sm:text-4xl">About Ledger LMS</h1>
+                <h1 className="font-display text-3xl text-text-primary sm:text-4xl">About UM-Nexa</h1>
                 <p className="mt-4 text-text-secondary">
-                    Ledger LMS is a role-based learning management platform built for three kinds of people —
+                    UM-Nexa is a role-based learning management platform built for three kinds of people —
                     learners working through courses, instructors running them, and admins keeping the whole
                     platform organized. Everyone gets exactly the tools their role needs, nothing more.
                 </p>

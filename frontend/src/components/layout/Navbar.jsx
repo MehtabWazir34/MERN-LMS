@@ -48,7 +48,7 @@ export default function Navbar() {
                         className="font-display text-xl text-primary"
                         onClick={() => setIsMenuOpen(false)}
                     >
-                        Ledger LMS
+                        UM-Nexa
                     </Link>
 
                     {/* Desktop Navigation */}

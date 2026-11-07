@@ -4,6 +4,7 @@ import PublicLayout from "../../components/layout/Publiclayout";
 import CourseCard from "../../components/common/CourseCard";
 import Button from "../../components/common/Button";
 import Spinner from "../../components/common/Spinner";
+import useSeo from "../../hooks/useSeo";
 import { getAllCourses } from "../../api/courses";
 
 const FEATURES = [
@@ -22,6 +23,12 @@ const FEATURES = [
 ];
 
 export default function HomePage() {
+    useSeo({
+        title: "Online courses with real instructors",
+        description:
+            "Browse courses, track your progress and get graded feedback from real instructors, all in one place.",
+    });
+
     const navigate = useNavigate();
     const [courses, setCourses] = useState([]);
     const [status, setStatus] = useState("loading"); // loading | success | error
@@ -65,6 +72,8 @@ export default function HomePage() {
             </section>
 
             <section className="mx-auto max-w-6xl px-6 pb-16">
+                {/* Keeps the heading order h1 > h2 > h3 without adding a visible title */}
+                <h2 className="sr-only">Why learn with us</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     {FEATURES.map((feature) => (
                         <div key={feature.title} className="rounded-lg border border-border bg-surface p-6">
@@ -83,9 +92,7 @@ export default function HomePage() {
                         <Spinner />
                     </div>
                 )}
-                {status === "error" && (
-                    <p className="mt-6 text-sm text-danger">Couldn't load courses right now.</p>
-                )}
+                {status === "error" && <p className="mt-6 text-sm text-danger">Couldn't load courses right now.</p>}
                 {status === "success" && courses.length === 0 && (
                     <p className="mt-6 text-text-secondary">No courses available yet — check back soon.</p>
                 )}

@@ -3,7 +3,7 @@ import { getToken, clearSession } from "../utils/tokenStorage";
 
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:5000/lms",
-  headers: { "Content-Type": "application/json" },
+  headers: { "Content-Type": "multipart/form-data" },
 });
 
 // authCheck.js reads req.headers["authorization"] as "Bearer <token>" —

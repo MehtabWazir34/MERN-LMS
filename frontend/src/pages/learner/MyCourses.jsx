@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
 import Modal from "../../components/layout/Modal";
-import { getMyEnrolledCourses } from "../../api/learner";
+import { getMyEnrollments } from "../../api/courses";
 import { getMyAttendance } from "../../api/attendance";
 import { getMyResults } from "../../api/results";
 
@@ -21,13 +21,19 @@ export default function MyCourses() {
         const load = async () => {
             setStatus("loading");
             try {
-                const [coursesData, attendanceData, resultsData] = await Promise.all([
-                    getMyEnrolledCourses({ signal: controller.signal }),
+                const [enrollmentsData, attendanceData, resultsData] = await Promise.all([
+                    getMyEnrollments({ signal: controller.signal }),
                     getMyAttendance(undefined, { signal: controller.signal }),
                     getMyResults(undefined, { signal: controller.signal }),
                 ]);
-                
-                setCourses(coursesData.enrollments.map(enrol=> enrol.course));
+
+                // Only approved enrollments are "my courses"; pending and rejected
+                // ones are listed under My Requests.
+                setCourses(
+                    enrollmentsData.enrollments
+                        .filter((enrollment) => enrollment.status === "approved")
+                        .map((enrollment) => enrollment.course)
+                );
                 setAttendance(attendanceData.records);
                 setResults(resultsData.results);
                 setStatus("success");
@@ -67,12 +73,19 @@ export default function MyCourses() {
         return <Alert variant="danger">Couldn't load your courses.</Alert>;
     }
 
+    const modalResults = resultsModalCourse ? resultsFor(resultsModalCourse._id) : [];
+
     return (
         <div>
             <h2 className="font-display text-xl text-text-primary">My courses</h2>
 
             {courses.length === 0 ? (
-                <p className="mt-4 text-sm text-text-secondary">You're not enrolled in any courses yet.</p>
+                <p className="mt-4 text-sm text-text-secondary">
+                    You're not enrolled in any courses yet.{" "}
+                    <Link to="/courses" className="font-medium text-primary hover:underline">
+                        Browse courses
+                    </Link>
+                </p>
             ) : (
                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {courses.map((course) => {
@@ -81,10 +94,11 @@ export default function MyCourses() {
                             <div key={course._id} className="flex flex-col overflow-hidden rounded-lg border border-border bg-surface">
                                 <Link to={`/courses/${course._id}`} className="group">
                                     <div className="aspect-video w-full overflow-hidden bg-surface-hover">
-                                        {course.poster ? (
+                                        {course.picture?.url ? (
                                             <img
-                                                src={course.poster}
+                                                src={course.picture.url}
                                                 alt={course.title}
+                                                loading="lazy"
                                                 className="h-full w-full object-cover transition-transform group-hover:scale-105"
                                             />
                                         ) : (
@@ -97,6 +111,12 @@ export default function MyCourses() {
                                         <h3 className="line-clamp-2 font-display text-lg text-text-primary group-hover:underline">
                                             {course.title}
                                         </h3>
+                                        {course.subtitle && (
+                                            <p className="mt-1 line-clamp-2 text-sm text-text-secondary">{course.subtitle}</p>
+                                        )}
+                                        <p className="mt-2 text-xs text-text-muted">
+                                            {[course.mode, course.level, course.duration].filter(Boolean).join(" · ")}
+                                        </p>
                                         <p className="mt-2 text-sm text-text-secondary">
                                             Attendance: {percent === null ? "—" : `${percent}%`}
                                         </p>
@@ -122,19 +142,18 @@ export default function MyCourses() {
                 onClose={closeResultsModal}
                 title={`${resultsModalCourse?.title ?? ""} — Results`}
             >
-                {resultsModalCourse && resultsFor(resultsModalCourse._id).length === 0 ? (
+                {modalResults.length === 0 ? (
                     <p className="text-sm text-text-secondary">No results posted yet.</p>
                 ) : (
                     <ul className="space-y-2">
-                        {resultsModalCourse &&
-                            resultsFor(resultsModalCourse._id).map((result) => (
-                                <li key={result._id} className="flex items-center justify-between text-sm">
-                                    <span className="text-text-secondary">{result.resultTitle}</span>
-                                    <span className="font-medium text-text-primary">
-                                        {result.obtainedMarks}/{result.totalMarks}
-                                    </span>
-                                </li>
-                            ))}
+                        {modalResults.map((result) => (
+                            <li key={result._id} className="flex items-center justify-between text-sm">
+                                <span className="text-text-secondary">{result.resultTitle}</span>
+                                <span className="font-medium text-text-primary">
+                                    {result.obtainedMarks}/{result.totalMarks}
+                                </span>
+                            </li>
+                        ))}
                     </ul>
                 )}
             </Modal>

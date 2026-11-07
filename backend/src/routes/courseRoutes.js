@@ -15,22 +15,30 @@ import {
   respondToEnrollment,
   getEnrollmentRequests
 } from '../controllers/courseCtrls.js';
+import { getManagedCourses } from '../controllers/courseManageCtrls.js';
 import { getMyEnrollments } from '../controllers/learnerCtrls.js';
 
 const courseRouter = express.Router();
 
 /* PUBLIC BROWSING */
-// optionalAuth (not authCheck) so guests can still browse, but a logged-in
-// learner's approved enrollment unlocks full lecture content in getCourseById.
 courseRouter.get('/', optionalAuth, getAllCourses);
+
+// Fixed paths must be declared BEFORE '/:id', otherwise Express treats
+// "my-enrollments" or "manage" as a course id and getCourseById throws a CastError.
+courseRouter.get('/my-enrollments', authCheck, restrictTo('learner'), getMyEnrollments);
+courseRouter.get('/manage', authCheck, restrictTo('instructor', 'admin'), getManagedCourses);
+
 courseRouter.get('/:id', optionalAuth, getCourseById);
 
-/* COURSE CRUD (instructor only, admin can override) */
-courseRouter.post('/', authCheck, restrictTo('instructor', 'admin'), uploadImgsStorage.single('poster'), createCourse);
-courseRouter.patch('/:id', authCheck, restrictTo('instructor', 'admin'), uploadImgsStorage.single('poster'), updateCourse);
+/* COURSE CRUD */
+// An instructor creates courses for themselves. An admin creates them for an instructor of their
+// choice (sent as `instructorId`; createCourse checks that it is a real Instructor), and can edit,
+// move or delete any course.
+courseRouter.post('/', authCheck, restrictTo('instructor', 'admin'), uploadImgsStorage.single('picture'), createCourse);
+courseRouter.patch('/:id', authCheck, restrictTo('instructor', 'admin'), uploadImgsStorage.single('picture'), updateCourse);
 courseRouter.delete('/:id', authCheck, restrictTo('instructor', 'admin'), deleteCourse);
 
-/* LECTURE VIDEOS(Future only) */
+/* LECTURE VIDEOS */
 courseRouter.post('/:id/videos', authCheck, restrictTo('instructor', 'admin'), uploadVideoStorage.single('video'), addLectureVideo);
 courseRouter.patch('/:id/videos/:videoId', authCheck, restrictTo('instructor', 'admin'), uploadVideoStorage.single('video'), updateLectureVideo);
 courseRouter.delete('/:id/videos/:videoId', authCheck, restrictTo('instructor', 'admin'), deleteLectureVideo);
@@ -39,7 +47,5 @@ courseRouter.delete('/:id/videos/:videoId', authCheck, restrictTo('instructor', 
 courseRouter.post('/:id/enroll', authCheck, restrictTo('learner'), requestEnroll);
 courseRouter.get('/:id/enroll', authCheck, restrictTo('instructor', 'admin'), getEnrollmentRequests);
 courseRouter.patch('/:id/enroll/:enrollmentId', authCheck, restrictTo('instructor', 'admin'), respondToEnrollment);
-courseRouter.get("/", getAllCourses)
-courseRouter.get('/my-enrollments', authCheck, restrictTo('learner'), getMyEnrollments);
-courseRouter.get('/:id', optionalAuth, getCourseById);
+
 export default courseRouter;

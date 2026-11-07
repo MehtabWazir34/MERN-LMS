@@ -1,45 +1,48 @@
-import { useState } from "react";
-import DashboardShell from "../../components/layout/Dashboardshell";
+import { useSearchParams } from "react-router-dom";
+import DashboardShell from "../../components/layout/Dashboardshell.jsx";
+import { ADMIN_DEFAULT_TAB, getAdminMenu } from "../../components/layout/dashboardMenus.jsx";
 import InstructorTable from "./Instructortable.jsx";
 import LearnerTable from "./Learnertable .jsx";
 import AdminTable from "./Admintable";
-import { Link } from "react-router-dom";
+import CoursesManager from "./CoursesManager.jsx";
+import ServicesManager from "./ServicesManger.jsx";
+import ProjectsManager from "./ProjectsManager.jsx";
+import PoliciesManager from "./PoliciesManager.jsx";
+import TeamManager from "./TeamManager.jsx";
 
-const TABS = [
-    { key: "instructors", label: "Instructors" },
-    { key: "learners", label: "Learners" },
-    { key: "admins", label: "Admins" },
-];
+// One entry per sidebar item. The keys are the ones in getAdminMenu() (dashboardMenus.js).
+// `heading` is only for tables that don't show their own title; the others do.
+const PANELS = {
+    instructors: { Component: InstructorTable },
+    learners: { Component: LearnerTable, heading: "Learners" },
+    admins: { Component: AdminTable, heading: "Admins" },
+    courses: { Component: CoursesManager },
+    services: { Component: ServicesManager },
+    projects: { Component: ProjectsManager },
+    policies: { Component: PoliciesManager },
+    team: { Component: TeamManager },
+};
+
+const MENU = getAdminMenu();
 
 export default function AdminDashboardPage() {
-    const [activeTab, setActiveTab] = useState("instructors");
+    // The selected item lives in the URL (?tab=team): refresh and the back button keep it.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const tabParam = searchParams.get("tab");
+    const activeTab = Object.hasOwn(PANELS, tabParam) ? tabParam : ADMIN_DEFAULT_TAB;
+
+    const { Component, heading } = PANELS[activeTab];
 
     return (
-        <DashboardShell title="Admin dashboard">
-            <Link to="/" className="text-sm font-medium text-primary hover:underline border-border bg-surface p-2 rounded-lg ">
-                                       ← Back to Home
-                                    </Link>
-            <div className="flex gap-1 rounded-md border border-border bg-surface p-1 my-4" style={{ width: "fit-content" }}>
-                {TABS.map((tab) => (
-                    <button
-                        key={tab.key}
-                        type="button"
-                        onClick={() => setActiveTab(tab.key)}
-                        className={`rounded px-4 py-2 text-sm font-medium transition-colors ${activeTab === tab.key
-                                ? "bg-primary text-white"
-                                : "text-text-secondary hover:bg-surface-hover"
-                            }`}
-                    >
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
-
-            <div className="mt-6">
-                {activeTab === "instructors" && <InstructorTable />}
-                {activeTab === "learners" && <LearnerTable />}
-                {activeTab === "admins" && <AdminTable />}
-            </div>
+        <DashboardShell
+            title="Admin dashboard"
+            menu={MENU}
+            activeKey={activeTab}
+            onSelect={(key) => setSearchParams({ tab: key })}
+        >
+            {heading && <h2 className="mb-4 font-display text-xl text-text-primary">{heading}</h2>}
+            {/* key resets the panel's own state when another item is chosen */}
+            <Component key={activeTab} />
         </DashboardShell>
     );
 }

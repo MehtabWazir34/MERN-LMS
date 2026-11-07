@@ -63,7 +63,7 @@ export default function AppRoutes() {
             <Route
                 path="/instructor/courses/new"
                 element={
-                    <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR]}>
+                    <ProtectedRoute allowedRoles={[ROLES.INSTRUCTOR, ROLES.ADMIN]}>
                         <CourseFormPage />
                     </ProtectedRoute>
                 }

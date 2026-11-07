@@ -7,7 +7,7 @@ export default function PublicLayout({ children }) {
             <main>{children}</main>
             
             <footer className="border-t border-border px-6 py-8 text-center text-sm text-text-muted">
-               Ledger LMS © {new Date().getFullYear()}  build with passion by WAZIR
+               UM-Nexa © {new Date().getFullYear()}  build with passion by WAZIR
             </footer>
         </div>
     );

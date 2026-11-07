@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DashboardShell from "../../components/layout/Dashboardshell";
+import { PATHS, getInstructorMenu } from "../../components/layout/dashboardMenus";
 import Button from "../../components/common/Button";
 import Spinner from "../../components/common/Spinner";
 import Alert from "../../components/common/Alert";
-import { getAllCourses, deleteCourse } from "../../api/courses";
-import { useAuth } from "../../context/AuthContext";
+import { getManagedCourses, deleteCourse } from "../../api/courses";
 
 export default function InstructorDashboardPage() {
-    const { user } = useAuth();
     const navigate = useNavigate();
 
     const [courses, setCourses] = useState([]);
@@ -16,28 +15,16 @@ export default function InstructorDashboardPage() {
     const [banner, setBanner] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
 
-    // Set once per mount — used as a dependency below without re-triggering
-    // the fetch every render (user is stable from context, but this keeps
-    // the effect's dependency list honest about what it actually reads).
-    const instructorId = user?._id;
-
     useEffect(() => {
-        // AbortController, not just a `let cancelled` flag: this actually
-        // cancels the in-flight request on unmount/re-run, instead of just
-        // ignoring its result — cheaper on the network and avoids a
-        // setState-after-unmount warning if the instructor navigates away
-        // before the response lands.
+        // AbortController cancels the request on unmount instead of only ignoring its result.
         const controller = new AbortController();
 
         const loadCourses = async () => {
             setStatus("loading");
             try {
-                const data = await getAllCourses({ signal: controller.signal });
-                // No "my courses" endpoint exists for instructors yet — filtering
-                // client-side against the public course list rather than adding
-                // a new backend route just for this.
-                const mine = data.courses.filter((c) => c.instructor?._id === instructorId);
-                setCourses(mine);
+                // The server returns only this instructor's courses, active and inactive.
+                const data = await getManagedCourses({}, { signal: controller.signal });
+                setCourses(data.courses);
                 setStatus("success");
             } catch (err) {
                 if (err.code === "ERR_CANCELED") return; // unmount/re-run, not a real failure
@@ -47,16 +34,22 @@ export default function InstructorDashboardPage() {
 
         loadCourses();
         return () => controller.abort();
-    }, [instructorId]);
+    }, []);
 
-    const handleDelete = useCallback(async (id) => {
-        if (!window.confirm("Delete this course? This cannot be undone.")) return;
+    const handleDelete = useCallback(async (course) => {
+        if (
+            !window.confirm(
+                `Delete "${course.title}"? Its lectures and enrollments are removed too. This cannot be undone.`
+            )
+        ) {
+            return;
+        }
 
-        setDeletingId(id);
+        setDeletingId(course._id);
         setBanner(null);
         try {
-            await deleteCourse(id);
-            setCourses((prev) => prev.filter((c) => c._id !== id));
+            await deleteCourse(course._id);
+            setCourses((prev) => prev.filter((c) => c._id !== course._id));
         } catch (err) {
             setBanner({
                 variant: "danger",
@@ -68,16 +61,19 @@ export default function InstructorDashboardPage() {
     }, []);
 
     return (
-        <DashboardShell title="Instructor dashboard">
-            <Link to="/" className="text-sm font-medium text-primary hover:bg-surface-hover border-border bg-surface p-2 rounded-lg ">
-                           ← Back to Home
-                        </Link>
-            <div className="flex flex-wrap items-center justify-between gap-3 my-4">
-                <p>Your courses, enrollment requests, grading.</p>
-                <Button fullWidth={false} onClick={() => navigate("/instructor/courses/new")}>
+        <DashboardShell
+            title="Instructor dashboard"
+            menu={getInstructorMenu()}
+            activeKey="courses"
+            actions={
+                <Button fullWidth={false} onClick={() => navigate(PATHS.courseCreate)}>
                     + Create course
                 </Button>
-            </div>
+            }
+        >
+            <h2 className="font-display text-xl text-text-primary">
+                My courses{status === "success" ? ` (${courses.length})` : ""}
+            </h2>
 
             {banner && (
                 <div className="mt-4">
@@ -98,55 +94,93 @@ export default function InstructorDashboardPage() {
             )}
 
             {status === "success" && courses.length === 0 && (
-                <p className="mt-8 text-text-secondary">
-                    You haven't created any courses yet — click "Create course" to get started.
+                <p className="mt-4 text-text-secondary">
+                    You haven't created any courses yet. Click "Create course" to get started.
                 </p>
             )}
 
             {status === "success" && courses.length > 0 && (
-                <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <ul className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
                     {courses.map((course) => (
-                        <div key={course._id} className="rounded-lg border border-border bg-surface p-4">
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="min-w-0">
-                                    <h3 className="truncate font-display text-lg text-text-primary">{course.title}</h3>
-                                    <p className="mt-1 line-clamp-2 text-sm text-text-secondary">{course.description}</p>
-                                    <p className="mt-2 text-sm font-medium text-primary">${course.price}</p>
-                                </div>
-                                {course.poster && (
+                        <li key={course._id} className="flex flex-col overflow-hidden rounded-lg border border-border bg-surface">
+                            <div className="relative aspect-video w-full overflow-hidden bg-surface-hover">
+                                {course.picture?.url ? (
                                     <img
-                                        src={course.poster}
+                                        src={course.picture.url}
                                         alt={course.title}
-                                        className="h-16 w-24 shrink-0 rounded object-cover"
+                                        loading="lazy"
+                                        className="h-full w-full object-cover"
                                     />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-sm text-text-muted">
+                                        No image
+                                    </div>
                                 )}
+                                <span
+                                    className={`absolute left-2 top-2 rounded-full px-2.5 py-1 text-xs font-medium ${course.isActive
+                                            ? "bg-success text-white"
+                                            : "border border-border bg-surface text-text-secondary"
+                                        }`}
+                                >
+                                    {course.isActive ? "Active" : "Inactive"}
+                                </span>
                             </div>
 
-                            <div className="mt-4 flex flex-wrap gap-2">
-                                <Link
-                                    to={`/instructor/courses/${course._id}/manage`}
-                                    className="rounded-md bg-primary-btn px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-btn-hover"
-                                >
-                                    Manage
-                                </Link>
-                                <Link
-                                    to={`/instructor/courses/${course._id}/edit`}
-                                    className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
-                                >
-                                    Edit
-                                </Link>
-                                <button
-                                    type="button"
-                                    onClick={() => handleDelete(course._id)}
-                                    disabled={deletingId === course._id}
-                                    className="rounded-md border border-danger/30 bg-danger/10 px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-danger/20 disabled:opacity-60"
-                                >
-                                    {deletingId === course._id ? "Deleting…" : "Delete"}
-                                </button>
+                            <div className="flex flex-1 flex-col p-4">
+                                <h3 className="line-clamp-2 font-display text-lg text-text-primary">{course.title}</h3>
+                                <p className="mt-1 line-clamp-2 text-sm text-text-secondary">{course.subtitle}</p>
+                                <p className="mt-2 text-xs text-text-muted">
+                                    {[course.mode, course.level, course.duration].filter(Boolean).join(" · ")}
+                                </p>
+                                <p className="mt-2 text-sm text-text-secondary">
+                                    Seats {course.approvedCount}/{course.seats} · {course.videosCount} lecture
+                                    {course.videosCount === 1 ? "" : "s"} ·{" "}
+                                    <span className="font-medium text-primary">
+                                        {course.price > 0 ? `$${course.price}` : "Free"}
+                                    </span>
+                                </p>
+
+                                {course.pendingCount > 0 && (
+                                    <Link
+                                        to={`${PATHS.courseManage(course._id)}?tab=requests`}
+                                        className="mt-2 inline-flex w-fit rounded-full bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning hover:bg-warning/20"
+                                    >
+                                        {course.pendingCount} pending request{course.pendingCount === 1 ? "" : "s"}
+                                    </Link>
+                                )}
+
+                                <div className="mt-4 flex flex-wrap gap-2 pt-1">
+                                    <Link
+                                        to={PATHS.courseManage(course._id)}
+                                        className="rounded-md bg-primary-btn px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-btn-hover"
+                                    >
+                                        Manage
+                                    </Link>
+                                    <Link
+                                        to={PATHS.courseEdit(course._id)}
+                                        className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
+                                    >
+                                        Edit
+                                    </Link>
+                                    <Link
+                                        to={PATHS.courseView(course._id)}
+                                        className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
+                                    >
+                                        View
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDelete(course)}
+                                        disabled={deletingId === course._id}
+                                        className="rounded-md border border-danger/30 bg-danger/10 px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-danger/20 disabled:opacity-60"
+                                    >
+                                        {deletingId === course._id ? "Deleting…" : "Delete"}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        </li>
                     ))}
-                </div>
+                </ul>
             )}
         </DashboardShell>
     );

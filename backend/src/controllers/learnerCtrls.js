@@ -9,7 +9,6 @@ import { isEmailTaken } from "../utils/checkEmailUnique.js";
 import { coursesModel } from "../models/courses.js";
 import { uploadToCloudinary } from "../config/uploadToCloudinary.js";
 
-
 const googleClient = new OAuth2Client(env.googleClientID);
 
 export const registerLearner = async (req, res) => {
@@ -26,10 +25,10 @@ export const registerLearner = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, 10);
     const learner = new learnerModel({ name, email, password: hashPassword });
     await learner.save();
-    
+
     const verifyToken = generateEmailVerifyToken(learner._id, "learner");
     await sendVerificationEmail(learner.email, learner.name, `${env.clientUrl}/verify-email?token=${verifyToken}`);
-    
+
     const token = generateAuthToken(learner._id, "learner");
     learner.password = undefined;
 
@@ -144,9 +143,8 @@ export const logoutLearner = async (req, res) => {
   res.status(200).json({ success: true, msg: "Logged out!" });
 };
 
-/* 
-   LEARNER SELF-SERVICE
-    */
+/* LEARNER SELF-SERVICE */
+
 export const updateMyProfile = async (req, res) => {
   try {
     const learner = await learnerModel.findById(req.user.id);
@@ -179,69 +177,33 @@ export const updateMyProfile = async (req, res) => {
     res.status(500).json({ success: false, msg: "Failed to update profile", ERR: error.message });
   }
 };
- export const getMyEnrollments = async (req, res) => {
-  try {
-    console.log("========== MY ENROLLMENTS ==========");
-    // console.log("USER:", req.user);
-    // console.log("USER ID:", req.user?.id);
 
+export const getMyEnrollments = async (req, res) => {
+  try {
     const courses = await coursesModel
       .find({ "enrolledLearners.learner": req.user.id })
-      .select("title poster enrolledLearners");
-
-    // console.log("COURSES FOUND:", courses.length);
+      .select("title subtitle picture mode level duration isActive enrolledLearners");
 
     const enrollments = courses.map((course) => {
-      const entry = course.enrolledLearners.find(
-        (e) => e.learner.toString() === req.user.id
-      );
-
-      // console.log("ENTRY:", entry);
+      const entry = course.enrolledLearners.find((e) => e.learner.toString() === req.user.id);
 
       return {
         course: {
           _id: course._id,
           title: course.title,
-          poster: course.poster,
+          subtitle: course.subtitle,
+          picture: course.picture,
+          mode: course.mode,
+          level: course.level,
+          duration: course.duration,
+          isActive: course.isActive,
         },
         status: entry?.status,
       };
     });
 
-    console.log("FINAL:", enrollments);
-
-    return res.status(200).json({
-      success: true,
-      count: enrollments.length,
-      enrollments,
-    });
+    res.status(200).json({ success: true, count: enrollments.length, enrollments });
   } catch (error) {
-    console.error("MY ENROLLMENTS ERROR:", error);
-
-    return res.status(500).json({
-      success: false,
-      msg: "Failed to fetch your enrollments",
-      ERR: error.message,
-    });
+    res.status(500).json({ success: false, msg: "Failed to fetch your enrollments", ERR: error.message });
   }
 };
-// export const getMyEnrollments = async (req, res) => {
-
-//   try {
-//     const courses = await coursesModel
-//       .find({ "enrolledLearners.learner": req.user.id })
-//       .select("title poster enrolledLearners");
-
-//     const enrollments = courses.map((course) => {
-//       const entry = course.enrolledLearners.find((e) => e.learner.toString() === req.user.id);
-//       return {
-//         course: { _id: course._id, title: course.title, poster: course.poster },
-//         status: entry?.status,
-//       };
-//     });
-
-//     res.status(200).json({ success: true, count: enrollments.length, enrollments });
-//   } catch (error) {
-//     res.status(500).json({ success: false, msg: "Failed to fetch your enrollments", ERR: error.message });
-//   }
-// };
